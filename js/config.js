@@ -4,7 +4,13 @@ const SUPABASE_URL = 'https://nfcuwpwxndkpkittjgnt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mY3V3cHd4bmRrcGtpdHRqZ250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDg5OTAsImV4cCI6MjA4Nzc4NDk5MH0.qQnQLh75VNdkvGbLXTqA1KPARNEpdtKNtlao3uwTfb8';
 
 // Initialize Supabase client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabase;
+try {
+  const sb = window.supabase;
+  supabase = sb.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch(e) {
+  console.error('Supabase init failed:', e);
+}
 
 // Checklist definitions (single source of truth)
 const CATEGORIES = [

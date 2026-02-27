@@ -1,7 +1,7 @@
 // Supabase configuration - UPDATE THESE with your project values
 // Find them at: https://supabase.com/dashboard → Project Settings → API
-const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE';
+const SUPABASE_URL = 'https://nfcuwpwxndkpkittjgnt.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_cw-aNUl8Jw3FDkR5I5TSZQ_oC_S32ne';
 
 // Initialize Supabase client
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

@@ -1,7 +1,7 @@
 // Supabase configuration - UPDATE THESE with your project values
 // Find them at: https://supabase.com/dashboard → Project Settings → API
 const SUPABASE_URL = 'https://nfcuwpwxndkpkittjgnt.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_cw-aNUl8Jw3FDkR5I5TSZQ_oC_S32ne';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mY3V3cHd4bmRrcGtpdHRqZ250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDg5OTAsImV4cCI6MjA4Nzc4NDk5MH0.qQnQLh75VNdkvGbLXTqA1KPARNEpdtKNtlao3uwTfb8';
 
 // Initialize Supabase client
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

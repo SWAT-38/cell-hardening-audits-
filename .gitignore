@@ -1,1 +1,4 @@
-"*.sqlite"  
+*.sqlite
+tailwindcss.exe
+input.css
+tailwind.config.js

@@ -1,0 +1,20 @@
+# Netlify redirect rules - handle SPA-like routing
+[[redirects]]
+  from = "/audit"
+  to = "/audit.html"
+  status = 200
+
+[[redirects]]
+  from = "/archive"
+  to = "/archive.html"
+  status = 200
+
+[[redirects]]
+  from = "/new-audit"
+  to = "/new-audit.html"
+  status = 200
+
+[[redirects]]
+  from = "/report"
+  to = "/report.html"
+  status = 200

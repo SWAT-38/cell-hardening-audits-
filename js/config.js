@@ -1,16 +1,38 @@
-// Supabase configuration - UPDATE THESE with your project values
-// Find them at: https://supabase.com/dashboard → Project Settings → API
-const SUPABASE_URL = 'https://nfcuwpwxndkpkittjgnt.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mY3V3cHd4bmRrcGtpdHRqZ250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDg5OTAsImV4cCI6MjA4Nzc4NDk5MH0.qQnQLh75VNdkvGbLXTqA1KPARNEpdtKNtlao3uwTfb8';
+// Firebase configuration - Using Firebase Realtime Database
+const firebaseConfig = {
+  apiKey: "AIzaSyCgfPikpAOeUcr-gT77ElvUqRhomm_7Cmg",
+  authDomain: "calendar-154d6.firebaseapp.com",
+  databaseURL: "https://calendar-154d6-default-rtdb.firebaseio.com",
+  projectId: "calendar-154d6",
+  storageBucket: "calendar-154d6.firebasestorage.app",
+  messagingSenderId: "357553351321",
+  appId: "1:357553351321:web:9d455ffd0e8dd1289aa608"
+};
 
-// Initialize Supabase client
-let supabase;
+// Initialize Firebase
+let database = null;
+let storage = null;
+
 try {
-  const sb = window.supabase;
-  supabase = sb.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-} catch(e) {
-  console.error('Supabase init failed:', e);
+  firebase.initializeApp(firebaseConfig);
+  database = firebase.database();
+  storage = firebase.storage();
+  console.log('✅ Firebase initialized successfully');
+  console.log('📡 Database URL:', firebaseConfig.databaseURL);
+  console.log('💾 Storage bucket:', firebaseConfig.storageBucket);
+  console.log('🔍 Storage object:', storage ? 'Available' : 'NOT AVAILABLE');
+} catch (e) {
+  console.error('❌ Firebase initialization error:', e);
 }
+
+// Global error handler for debugging
+window.addEventListener('error', (e) => {
+  console.error('🚨 Global error:', e.message, 'at', e.filename, 'line', e.lineno);
+});
+
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('🚨 Unhandled promise rejection:', e.reason);
+});
 
 // Checklist definitions (single source of truth)
 const CATEGORIES = [
@@ -82,9 +104,19 @@ const CATEGORIES = [
       { id: 'rails_extend_centerers', label: 'Rails extend correctly into centerers and staging' },
     ]
   },
+  {
+    id: 'stl', name: 'STL', icon: '🏗️', critical: false,
+    items: [
+      { id: 'lifts_functioning', label: 'Lifts are functioning properly on all shelves' },
+      { id: 'pnd_speeds', label: 'PND speeds are within range and keeping correct data' },
+      { id: 'popup_gates', label: 'Pop-up gates are opening & closing correctly' },
+    ]
+  },
 ];
 
 const TOTAL_ITEMS = CATEGORIES.reduce((sum, c) => sum + c.items.length, 0);
+
+console.log('📋 Config loaded: ' + TOTAL_ITEMS + ' checklist items across ' + CATEGORIES.length + ' categories');
 
 const DC_OPTIONS = [
   { value: '6006', label: '6006 \u2013 Cullman, AL' },

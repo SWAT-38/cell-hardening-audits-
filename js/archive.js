@@ -83,9 +83,9 @@ function renderDesktopRow(a, num) {
       <td class="px-4 py-3">${formatDate(a.archived_at)}</td>
       <td class="px-4 py-3">${renderStatusBadge(a.status)}</td>
       <td class="px-4 py-3 flex gap-2">
-        <a href="/report.html?id=${a.id}" class="text-walmart-spark font-semibold hover:underline">Report</a>
+        <a href="report.html?id=${a.id}" class="text-walmart-spark font-semibold hover:underline">Report</a>
         ${notes ? `<button onclick="toggleNotes('dn-${a.id}')" class="text-dark-muted hover:text-walmart-spark transition text-xs" title="Notes">📝</button>` : ''}
-        <button onclick="unarchiveAudit(${a.id})" class="text-dark-muted hover:text-walmart-spark transition text-xs" title="Restore">↩️</button>
+        <button onclick="unarchiveAudit('${a.id}')" class="text-dark-muted hover:text-walmart-spark transition text-xs" title="Restore">↩️</button>
       </td>
     </tr>
     ${notes ? renderNotesRow(a, 'dn-' + a.id) : ''}`;
@@ -103,9 +103,9 @@ function renderMobileCard(a, num) {
       <p class="text-sm text-dark-muted">${a.auditor} · ${formatDate(a.started_at)}</p>
       <p class="text-xs text-dark-muted mt-1">Archived ${formatDate(a.archived_at)}</p>
       <div class="flex items-center gap-3 mt-3 pt-3 border-t border-dark-border">
-        <a href="/report.html?id=${a.id}" class="flex-1 text-center bg-walmart-spark text-dark-bg font-semibold py-2.5 rounded-lg text-sm active:brightness-90 transition">Report</a>
+        <a href="report.html?id=${a.id}" class="flex-1 text-center bg-walmart-spark text-dark-bg font-semibold py-2.5 rounded-lg text-sm active:brightness-90 transition">Report</a>
         ${notes ? `<button onclick="toggleNotes('mn-${a.id}')" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-dark-surface text-dark-muted active:bg-dark-border transition" title="Notes">📝</button>` : ''}
-        <button onclick="unarchiveAudit(${a.id})" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-dark-surface text-dark-muted active:bg-dark-border transition" title="Restore">↩️</button>
+        <button onclick="unarchiveAudit('${a.id}')" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-dark-surface text-dark-muted active:bg-dark-border transition" title="Restore">↩️</button>
       </div>
       ${notes ? `<div id="mn-${a.id}" class="hidden mt-3 pt-3 border-t border-dark-border">${renderNotesContent(a)}</div>` : ''}
     </div>`;

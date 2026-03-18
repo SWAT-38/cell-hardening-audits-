@@ -1,145 +1,256 @@
-// Database operations - all Supabase calls in one place
+// Database operations - Firebase Realtime Database
 
 const db = {
   // ── Audits ──────────────────────────────────────────────
   async getActiveAudits() {
-    const { data, error } = await supabase
-      .from('audits')
-      .select('*')
-      .is('archived_at', null)
-      .order('id', { ascending: false });
-    if (error) throw error;
-    return data;
+    const snapshot = await database.ref('audits').orderByChild('archived_at').equalTo(null).once('value');
+    const audits = [];
+    snapshot.forEach(child => {
+      audits.push({ id: child.key, ...child.val() });
+    });
+    return audits.sort((a, b) => (b.id || 0) - (a.id || 0));
   },
 
   async getArchivedAudits() {
-    const { data, error } = await supabase
-      .from('audits')
-      .select('*')
-      .not('archived_at', 'is', null)
-      .order('archived_at', { ascending: false });
-    if (error) throw error;
-    return data;
+    const snapshot = await database.ref('audits').once('value');
+    const audits = [];
+    snapshot.forEach(child => {
+      const data = child.val();
+      if (data.archived_at) {
+        audits.push({ id: child.key, ...data });
+      }
+    });
+    return audits.sort((a, b) => (b.archived_at || '').localeCompare(a.archived_at || ''));
   },
 
   async getAudit(id) {
-    const { data, error } = await supabase
-      .from('audits')
-      .select('*')
-      .eq('id', id)
-      .single();
-    if (error) throw error;
-    return data;
+    const snapshot = await database.ref(`audits/${id}`).once('value');
+    if (!snapshot.exists()) throw new Error('Audit not found');
+    return { id: snapshot.key, ...snapshot.val() };
   },
 
   async createAudit(auditor, lineId, location) {
-    const { data, error } = await supabase
-      .from('audits')
-      .insert({ auditor, line_id: lineId, location })
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    const newRef = database.ref('audits').push();
+    const auditData = {
+      auditor,
+      line_id: lineId,
+      location,
+      started_at: new Date().toISOString(),
+      status: 'in_progress',
+      archived_at: null
+    };
+    await newRef.set(auditData);
+    return { id: newRef.key, ...auditData };
   },
 
   async deleteAudit(id) {
-    const { error } = await supabase.from('audits').delete().eq('id', id);
-    if (error) throw error;
+    console.log('🗑️ Deleting audit:', id);
+    // Delete audit record
+    await database.ref(`audits/${id}`).remove();
+    // Delete all audit items
+    await database.ref(`audit_items/${id}`).remove();
+    // Delete all photos for this audit
+    await database.ref(`audit_photos/${id}`).remove();
+    console.log('✅ Audit and all associated data deleted');
   },
 
   async archiveAudit(id) {
-    const { error } = await supabase
-      .from('audits')
-      .update({ archived_at: new Date().toISOString() })
-      .eq('id', id);
-    if (error) throw error;
+    await database.ref(`audits/${id}/archived_at`).set(new Date().toISOString());
   },
 
   async unarchiveAudit(id) {
-    const { error } = await supabase
-      .from('audits')
-      .update({ archived_at: null })
-      .eq('id', id);
-    if (error) throw error;
+    await database.ref(`audits/${id}/archived_at`).set(null);
   },
 
   async completeAudit(id, notes, status) {
-    const { error } = await supabase
-      .from('audits')
-      .update({
-        notes,
-        status,
-        completed_at: new Date().toISOString(),
-      })
-      .eq('id', id);
-    if (error) throw error;
+    await database.ref(`audits/${id}`).update({
+      notes,
+      status,
+      completed_at: new Date().toISOString()
+    });
   },
 
   // ── Audit Items ────────────────────────────────────────
   async getAuditItems(auditId) {
-    const { data, error } = await supabase
-      .from('audit_items')
-      .select('*')
-      .eq('audit_id', auditId);
-    if (error) throw error;
-    return data;
+    const snapshot = await database.ref(`audit_items/${auditId}`).once('value');
+    const items = [];
+    snapshot.forEach(child => {
+      items.push({ id: child.key, ...child.val() });
+    });
+    return items;
   },
 
   async upsertItem(auditId, categoryId, itemId, result) {
-    const { error } = await supabase
-      .from('audit_items')
-      .upsert(
-        { audit_id: auditId, category_id: categoryId, item_id: itemId, result },
-        { onConflict: 'audit_id,item_id' }
-      );
-    if (error) throw error;
+    await database.ref(`audit_items/${auditId}/${itemId}`).update({
+      audit_id: auditId,
+      category_id: categoryId,
+      item_id: itemId,
+      result
+    });
   },
 
   async upsertNote(auditId, categoryId, itemId, note) {
-    const { error } = await supabase
-      .from('audit_items')
-      .upsert(
-        { audit_id: auditId, category_id: categoryId, item_id: itemId, note },
-        { onConflict: 'audit_id,item_id' }
-      );
-    if (error) throw error;
+    await database.ref(`audit_items/${auditId}/${itemId}`).update({
+      audit_id: auditId,
+      category_id: categoryId,
+      item_id: itemId,
+      note
+    });
   },
 
   // ── Photos ─────────────────────────────────────────────
   async getAuditPhotos(auditId) {
-    const { data, error } = await supabase
-      .from('audit_photos')
-      .select('*')
-      .eq('audit_id', auditId)
-      .order('uploaded_at');
-    if (error) throw error;
-    return data;
+    const snapshot = await database.ref(`audit_photos/${auditId}`).once('value');
+    const photos = [];
+    snapshot.forEach(child => {
+      const photoData = child.val();
+      // Photos now have data_url directly, no need to fetch from storage
+      photos.push({ 
+        id: child.key, 
+        ...photoData,
+        url: photoData.data_url // Use the base64 data URL directly
+      });
+    });
+    return photos.sort((a, b) => (a.uploaded_at || '').localeCompare(b.uploaded_at || ''));
+  },
+
+  // Helper function to compress image (optimized for speed)
+  _compressImage(file, maxWidth = 1280, maxHeight = 1280, quality = 0.75) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          // Calculate new dimensions while maintaining aspect ratio
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+          
+          // Create canvas and compress
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d', { alpha: false }); // Faster without alpha
+          
+          // Use faster image smoothing
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'medium'; // medium is faster than high
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to base64 with compression
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+          
+          console.log('🗜️ Image compressed:', 
+            `Original: ${Math.round(e.target.result.length / 1024)} KB`,
+            `Compressed: ${Math.round(compressedDataUrl.length / 1024)} KB`,
+            `Dimensions: ${img.width}x${img.height} → ${width}x${height}`,
+            `Reduction: ${Math.round((1 - compressedDataUrl.length / e.target.result.length) * 100)}%`
+          );
+          
+          resolve(compressedDataUrl);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   },
 
   async uploadPhoto(auditId, itemId, file) {
-    const ext = file.name.split('.').pop();
-    const path = `${auditId}/${itemId}_${Date.now()}.${ext}`;
-    const { error: uploadErr } = await supabase.storage
-      .from('audit-photos')
-      .upload(path, file);
-    if (uploadErr) throw uploadErr;
-
-    const { error: dbErr } = await supabase
-      .from('audit_photos')
-      .insert({ audit_id: auditId, item_id: itemId, storage_path: path });
-    if (dbErr) throw dbErr;
-    return path;
+    console.log('📦 Starting photo upload...', { auditId, itemId, fileName: file.name, fileSize: file.size });
+    
+    try {
+      // Compress the image before storing
+      const compressedDataUrl = await this._compressImage(file);
+      
+      const newPhotoRef = database.ref(`audit_photos/${auditId}`).push();
+      console.log('💾 Saving compressed photo to database...');
+      
+      await newPhotoRef.set({
+        audit_id: auditId,
+        item_id: itemId,
+        data_url: compressedDataUrl, // Store compressed base64 data
+        file_name: file.name,
+        original_size: file.size,
+        compressed_size: compressedDataUrl.length,
+        uploaded_at: new Date().toISOString()
+      });
+      
+      console.log('✅ Compressed photo saved to database');
+      return newPhotoRef.key;
+    } catch (err) {
+      console.error('❌ Photo upload error:', err);
+      throw err;
+    }
   },
 
-  async deletePhoto(photoId, storagePath) {
-    await supabase.storage.from('audit-photos').remove([storagePath]);
-    const { error } = await supabase.from('audit_photos').delete().eq('id', photoId);
-    if (error) throw error;
+  async deletePhoto(photoId, auditId) {
+    // Photos are stored in database now, just remove the database entry
+    await database.ref(`audit_photos/${auditId}/${photoId}`).remove();
   },
 
-  getPhotoUrl(storagePath) {
-    const { data } = supabase.storage.from('audit-photos').getPublicUrl(storagePath);
-    return data.publicUrl;
+  // ── Helpers ────────────────────────────────────────────
+  async getStorageUsage() {
+    try {
+      console.log('📊 Calculating storage usage...');
+      
+      // Get all audits
+      const auditsSnapshot = await database.ref('audits').once('value');
+      const auditsSize = JSON.stringify(auditsSnapshot.val() || {}).length;
+      
+      // Get all audit items
+      const itemsSnapshot = await database.ref('audit_items').once('value');
+      const itemsSize = JSON.stringify(itemsSnapshot.val() || {}).length;
+      
+      // Get all photos (this is the big one)
+      const photosSnapshot = await database.ref('audit_photos').once('value');
+      let photosSize = 0;
+      let photoCount = 0;
+      
+      photosSnapshot.forEach(auditPhotos => {
+        auditPhotos.forEach(photo => {
+          const photoData = photo.val();
+          if (photoData.data_url) {
+            photosSize += photoData.data_url.length;
+            photoCount++;
+          }
+        });
+      });
+      
+      const totalBytes = auditsSize + itemsSize + photosSize;
+      const totalMB = totalBytes / (1024 * 1024);
+      const totalGB = totalMB / 1024;
+      const percentUsed = (totalGB / 1) * 100; // 1 GB free tier
+      
+      console.log('✅ Storage calculated:', {
+        auditsSize: Math.round(auditsSize / 1024) + ' KB',
+        itemsSize: Math.round(itemsSize / 1024) + ' KB',
+        photosSize: Math.round(photosSize / (1024 * 1024)) + ' MB',
+        photoCount,
+        totalMB: totalMB.toFixed(2) + ' MB',
+        percentUsed: percentUsed.toFixed(1) + '%'
+      });
+      
+      return {
+        totalBytes,
+        totalMB,
+        totalGB,
+        percentUsed,
+        photoCount,
+        photosSize,
+        auditDataSize: auditsSize + itemsSize
+      };
+    } catch (err) {
+      console.error('❌ Storage calculation error:', err);
+      return null;
+    }
   },
 
   // ── Helpers ────────────────────────────────────────────
@@ -161,3 +272,5 @@ const db = {
     return hasCriticalFail ? 'critical_fail' : 'fail';
   },
 };
+
+console.log('✅ Database layer loaded (Firebase mode)');

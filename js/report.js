@@ -2,8 +2,13 @@
 
 async function loadReport() {
   const params = new URLSearchParams(window.location.search);
-  const auditId = parseInt(params.get('id'));
-  if (!auditId) { window.location.href = '/'; return; }
+  const auditId = params.get('id');
+  console.log('📄 Loading report for audit ID:', auditId);
+  if (!auditId) { 
+    console.error('❌ No audit ID found in URL');
+    window.location.href = 'index.html'; 
+    return; 
+  }
 
   try {
     const audit = await db.getAudit(auditId);
@@ -90,7 +95,7 @@ function renderReport(audit, saved, photoMap, progress) {
           </div>
           ${itemPhotos.length ? `
             <div class="flex flex-wrap gap-2 ml-8">
-              ${itemPhotos.map(p => `<a href="${db.getPhotoUrl(p.storage_path)}" target="_blank"><img src="${db.getPhotoUrl(p.storage_path)}" alt="Audit photo" class="w-16 h-16 object-cover rounded-lg border border-dark-border hover:ring-2 hover:ring-walmart-spark transition"></a>`).join('')}
+              ${itemPhotos.map(p => `<img src="${p.url}" alt="Audit photo" onclick="viewPhotoFullScreen(this.src)" class="w-16 h-16 object-cover rounded-lg border border-dark-border hover:ring-2 hover:ring-walmart-spark transition cursor-pointer"></img>`).join('')}
             </div>` : ''}
         </div>`;
     }
@@ -100,7 +105,7 @@ function renderReport(audit, saved, photoMap, progress) {
   // Actions
   html += `
     <div class="flex flex-col sm:flex-row gap-4 mt-6 mb-10">
-      <a href="/" class="bg-dark-surface text-dark-text border border-dark-border font-semibold px-6 py-3 rounded-lg hover:bg-dark-border active:bg-dark-border transition text-center">\u2190 Dashboard</a>
+      <a href="index.html" class="bg-dark-surface text-dark-text border border-dark-border font-semibold px-6 py-3 rounded-lg hover:bg-dark-border active:bg-dark-border transition text-center">\u2190 Dashboard</a>
       <button onclick="copyLink()" id="copy-btn" class="bg-walmart-spark text-dark-bg font-semibold px-6 py-3 rounded-lg hover:brightness-110 active:brightness-90 transition">\ud83d\udd17 Copy Link</button>
     </div>`;
 
@@ -118,6 +123,27 @@ function copyLink() {
       btn.classList.replace('bg-wm-green', 'bg-walmart-spark');
     }, 2000);
   });
+}
+
+function viewPhotoFullScreen(imgSrc) {
+  // Create fullscreen overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4';
+  overlay.onclick = () => overlay.remove();
+  
+  overlay.innerHTML = `
+    <div class="relative max-w-full max-h-full">
+      <img src="${imgSrc}" class="max-w-full max-h-screen object-contain" onclick="event.stopPropagation()">
+      <button onclick="this.parentElement.parentElement.remove()" 
+              class="absolute top-4 right-4 bg-red-600 text-white rounded-full w-10 h-10 text-2xl font-bold hover:bg-red-700 transition">
+        &times;
+      </button>
+      <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-4 py-2 rounded-lg text-sm">
+        Click anywhere to close
+      </div>
+    </div>`;
+  
+  document.body.appendChild(overlay);
 }
 
 // Init

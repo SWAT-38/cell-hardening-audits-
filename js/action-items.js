@@ -337,15 +337,15 @@ function renderBarChart() {
     <!-- Legend -->
     <div class="flex flex-wrap items-center justify-center gap-4 mt-4 pt-3 border-t border-dark-border text-xs">
       <div class="flex items-center gap-2">
-        <div class="w-5 h-5 bg-yellow-500 rounded border border-gray-600"></div>
+        <div class="w-5 h-5 bg-yellow-500 rounded"></div>
         <span class="text-dark-text font-semibold">Open</span>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-5 h-5 bg-blue-500 rounded border border-gray-600"></div>
+        <div class="w-5 h-5 bg-blue-500 rounded"></div>
         <span class="text-dark-text font-semibold">In Progress</span>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-5 h-5 bg-green-500 rounded border border-gray-600"></div>
+        <div class="w-5 h-5 bg-green-500 rounded"></div>
         <span class="text-dark-text font-semibold">Closed</span>
       </div>
     </div>

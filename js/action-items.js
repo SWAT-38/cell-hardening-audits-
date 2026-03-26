@@ -6,7 +6,6 @@ let modalPhotoData = null;
 let filterStatus = '';
 let filterPriority = '';
 let filterDC = '';
-let chartDC = ''; // Separate filter for the chart
 
 const DC_LIST = [
   { value: '6006', label: '6006 – Cullman, AL' },
@@ -100,14 +99,7 @@ function renderPage() {
     <!-- Bar Chart -->
     <div class="bg-dark-card rounded-xl border border-dark-border p-4 mb-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <h3 class="text-base font-bold">📊 Items by Cell</h3>
-        <div class="flex items-center gap-2">
-          <label class="text-xs font-semibold text-dark-muted">View:</label>
-          <select onchange="chartDC=this.value; renderPage()" class="bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-walmart-spark">
-            <option value="" ${chartDC === '' ? 'selected' : ''}>All Sites</option>
-            ${DC_LIST.map(dc => `<option value="${dc.value}" ${chartDC === dc.value ? 'selected' : ''}>${dc.label}</option>`).join('')}
-          </select>
-        </div>
+        <h3 class="text-base font-bold">📊 Items by Cell${filterDC ? ` (DC ${filterDC})` : ' (All Sites)'}</h3>
       </div>
       ${renderBarChart()}
     </div>
@@ -259,8 +251,8 @@ function daysOpenBadge(item) {
 }
 
 function renderBarChart() {
-  // Filter items by chartDC
-  const chartItems = chartDC ? allItems.filter(i => i.dc === chartDC) : allItems;
+  // Filter items by filterDC (same as main filter)
+  const chartItems = filterDC ? allItems.filter(i => i.dc === filterDC) : allItems;
   
   // Group by cell
   const cellData = {};

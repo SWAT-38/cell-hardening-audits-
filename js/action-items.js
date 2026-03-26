@@ -296,38 +296,49 @@ function renderBarChart() {
         const closedPct = (data.closed / data.total) * 100;
         
         return `
-          <div class="flex items-center gap-3">
-            <div class="w-20 sm:w-24 text-xs font-semibold text-dark-text flex-shrink-0">
-              ${cell === 'Unknown' ? '<span class="text-dark-muted">No Cell</span>' : `Cell ${cell}`}
-            </div>
-            <div class="flex-1">
-              <div class="relative h-10 bg-dark-surface rounded-lg overflow-hidden border border-dark-border">
-                <!-- Open -->
-                ${data.open > 0 ? `
-                <div class="absolute left-0 top-0 h-full bg-yellow-500 flex items-center justify-center text-xs font-bold text-gray-900" 
-                     style="width: ${openPct}%" title="${data.open} Open">
-                  ${openPct > 12 ? data.open : ''}
-                </div>` : ''}
-                <!-- In Progress -->
-                ${data.in_progress > 0 ? `
-                <div class="absolute top-0 h-full bg-blue-500 flex items-center justify-center text-xs font-bold text-white" 
-                     style="left: ${openPct}%; width: ${inProgPct}%" title="${data.in_progress} In Progress">
-                  ${inProgPct > 12 ? data.in_progress : ''}
-                </div>` : ''}
-                <!-- Closed -->
-                ${data.closed > 0 ? `
-                <div class="absolute top-0 h-full bg-green-500 flex items-center justify-center text-xs font-bold text-white" 
-                     style="left: ${openPct + inProgPct}%; width: ${closedPct}%" title="${data.closed} Closed">
-                  ${closedPct > 12 ? data.closed : ''}
-                </div>` : ''}
+          <div class="mb-3">
+            <!-- Cell Label and Bar -->
+            <div class="flex items-center gap-3 mb-1">
+              <div class="w-20 sm:w-24 text-xs font-semibold text-dark-text flex-shrink-0">
+                ${cell === 'Unknown' ? '<span class="text-dark-muted">No Cell</span>' : `Cell ${cell}`}
+              </div>
+              <div class="flex-1">
+                <div class="relative h-10 bg-dark-surface rounded-lg overflow-hidden border border-dark-border">
+                  <!-- Open -->
+                  ${data.open > 0 ? `
+                  <div class="absolute left-0 top-0 h-full bg-yellow-500 flex items-center justify-center text-xs font-bold text-gray-900" 
+                       style="width: ${openPct}%" title="${data.open} Open">
+                    ${openPct > 12 ? data.open : ''}
+                  </div>` : ''}
+                  <!-- In Progress -->
+                  ${data.in_progress > 0 ? `
+                  <div class="absolute top-0 h-full bg-blue-500 flex items-center justify-center text-xs font-bold text-white" 
+                       style="left: ${openPct}%; width: ${inProgPct}%" title="${data.in_progress} In Progress">
+                    ${inProgPct > 12 ? data.in_progress : ''}
+                  </div>` : ''}
+                  <!-- Closed -->
+                  ${data.closed > 0 ? `
+                  <div class="absolute top-0 h-full bg-green-500 flex items-center justify-center text-xs font-bold text-white" 
+                       style="left: ${openPct + inProgPct}%; width: ${closedPct}%" title="${data.closed} Closed">
+                    ${closedPct > 12 ? data.closed : ''}
+                  </div>` : ''}
+                </div>
+              </div>
+              <div class="w-16 text-right flex items-center justify-end gap-2 flex-shrink-0">
+                <span class="text-xs font-semibold text-dark-text">${data.total}</span>
+                <span class="text-xs text-dark-muted">total</span>
               </div>
             </div>
-            <div class="w-16 text-right flex items-center justify-end gap-2 flex-shrink-0">
-              <span class="text-xs font-semibold text-dark-text">${data.total}</span>
-              <span class="text-xs text-dark-muted">total</span>
+            <!-- Breakdown Counts -->
+            <div class="flex items-center gap-3 pl-20 sm:pl-24">
+              <div class="flex items-center gap-4 text-xs">
+                ${data.open > 0 ? `<span class="text-yellow-400 font-semibold">🟡 ${data.open} Open</span>` : ''}
+                ${data.in_progress > 0 ? `<span class="text-blue-400 font-semibold">🔵 ${data.in_progress} In Progress</span>` : ''}
+                ${data.closed > 0 ? `<span class="text-green-400 font-semibold">🟢 ${data.closed} Closed</span>` : ''}
+              </div>
             </div>
           </div>
-        `;
+        `;}
       }).join('')}
     </div>
     

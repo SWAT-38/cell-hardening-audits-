@@ -227,7 +227,11 @@ function renderBarChart() {
   const sortedCells = Object.keys(cellData).sort();
   
   if (sortedCells.length === 0) {
-    return '<div class="text-center py-8 text-dark-muted text-sm">No data to display</div>';
+    return `
+      <div class="text-center py-8 text-dark-muted text-sm">
+        <p class="mb-2">No action items yet</p>
+        <p class="text-xs">Add some items to see the chart!</p>
+      </div>`;
   }
 
   // Find max for scaling
@@ -240,7 +244,6 @@ function renderBarChart() {
         const openPct = (data.open / data.total) * 100;
         const inProgPct = (data.in_progress / data.total) * 100;
         const closedPct = (data.closed / data.total) * 100;
-        const barWidth = (data.total / maxTotal) * 100;
         
         return `
           <div class="flex items-center gap-3">
@@ -248,26 +251,30 @@ function renderBarChart() {
               ${cell === 'Unknown' ? '<span class="text-dark-muted">No Cell</span>' : `Cell ${cell}`}
             </div>
             <div class="flex-1">
-              <div class="relative h-8 bg-dark-surface rounded-lg overflow-hidden" style="width: ${barWidth}%; min-width: 60px;">
+              <div class="relative h-10 bg-dark-surface rounded-lg overflow-hidden border border-dark-border">
+                <!-- Open -->
                 ${data.open > 0 ? `
-                <div class="absolute left-0 top-0 h-full bg-yellow-600 flex items-center justify-center text-xs font-bold text-white" 
+                <div class="absolute left-0 top-0 h-full bg-yellow-500 flex items-center justify-center text-xs font-bold text-gray-900" 
                      style="width: ${openPct}%" title="${data.open} Open">
-                  ${data.open > 0 && openPct > 15 ? data.open : ''}
+                  ${openPct > 12 ? data.open : ''}
                 </div>` : ''}
+                <!-- In Progress -->
                 ${data.in_progress > 0 ? `
-                <div class="absolute top-0 h-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white" 
+                <div class="absolute top-0 h-full bg-blue-500 flex items-center justify-center text-xs font-bold text-white" 
                      style="left: ${openPct}%; width: ${inProgPct}%" title="${data.in_progress} In Progress">
-                  ${data.in_progress > 0 && inProgPct > 15 ? data.in_progress : ''}
+                  ${inProgPct > 12 ? data.in_progress : ''}
                 </div>` : ''}
+                <!-- Closed -->
                 ${data.closed > 0 ? `
-                <div class="absolute top-0 h-full bg-green-600 flex items-center justify-center text-xs font-bold text-white" 
+                <div class="absolute top-0 h-full bg-green-500 flex items-center justify-center text-xs font-bold text-white" 
                      style="left: ${openPct + inProgPct}%; width: ${closedPct}%" title="${data.closed} Closed">
-                  ${data.closed > 0 && closedPct > 15 ? data.closed : ''}
+                  ${closedPct > 12 ? data.closed : ''}
                 </div>` : ''}
               </div>
             </div>
-            <div class="w-12 text-right text-xs font-semibold text-dark-muted flex-shrink-0">
-              ${data.total}
+            <div class="w-16 text-right flex items-center justify-end gap-2 flex-shrink-0">
+              <span class="text-xs font-semibold text-dark-text">${data.total}</span>
+              <span class="text-xs text-dark-muted">total</span>
             </div>
           </div>
         `;
@@ -277,16 +284,16 @@ function renderBarChart() {
     <!-- Legend -->
     <div class="flex flex-wrap items-center justify-center gap-4 mt-4 pt-3 border-t border-dark-border text-xs">
       <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-yellow-600 rounded"></div>
-        <span class="text-dark-muted">Open</span>
+        <div class="w-5 h-5 bg-yellow-500 rounded border border-gray-600"></div>
+        <span class="text-dark-text font-semibold">Open</span>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-blue-600 rounded"></div>
-        <span class="text-dark-muted">In Progress</span>
+        <div class="w-5 h-5 bg-blue-500 rounded border border-gray-600"></div>
+        <span class="text-dark-text font-semibold">In Progress</span>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-green-600 rounded"></div>
-        <span class="text-dark-muted">Closed</span>
+        <div class="w-5 h-5 bg-green-500 rounded border border-gray-600"></div>
+        <span class="text-dark-text font-semibold">Closed</span>
       </div>
     </div>
   `;

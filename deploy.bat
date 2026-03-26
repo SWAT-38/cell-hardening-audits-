@@ -23,6 +23,16 @@ git push origin main
 echo.
 echo ========================================
 echo   ✅ DONE! Vercel will auto-deploy!
-echo   Check https://vercel.com for status
+echo   Opening fresh page in 3 seconds...
 echo ========================================
+
+timeout /t 3 /nobreak >nul
+
+echo Opening browser...
+start "" "https://cell-hardening-audits.vercel.app/"
+
+echo.
+echo ✅ Fresh page opened!
+echo Wait ~1 minute for Vercel deployment to complete.
+echo.
 pause

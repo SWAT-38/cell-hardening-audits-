@@ -144,4 +144,4 @@ const DC_OPTIONS = [
   { value: '6040', label: '6040 \u2013 Hope Mills, NC' },
 ];
 
-const CELL_OPTIONS = ['213', '214', '215', '216', '217', '218', '219'];
+const CELL_OPTIONS = ['212', '213', '214', '215', '216', '217', '218', '219'];

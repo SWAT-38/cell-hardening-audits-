@@ -6,6 +6,7 @@ let modalPhotoData = null;
 let filterStatus = '';
 let filterPriority = '';
 let filterDC = '';
+let chartDC = ''; // Separate filter for the chart
 
 const DC_LIST = [
   { value: '6006', label: '6006 – Cullman, AL' },
@@ -91,6 +92,21 @@ function renderPage() {
         <div class="text-2xl font-bold text-green-400">${closed}</div>
         <div class="text-xs text-dark-muted mt-1">Closed</div>
       </div>
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="bg-dark-card rounded-xl border border-dark-border p-4 mb-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <h3 class="text-base font-bold">📊 Items by Cell</h3>
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-semibold text-dark-muted">View:</label>
+          <select onchange="chartDC=this.value; renderPage()" class="bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+            <option value="" ${chartDC === '' ? 'selected' : ''}>All Sites</option>
+            ${DC_LIST.map(dc => `<option value="${dc.value}" ${chartDC === dc.value ? 'selected' : ''}>${dc.label}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      ${renderBarChart()}
     </div>
 
     ${high > 0 ? `
@@ -190,6 +206,90 @@ function statusBadge(s) {
   if (s === 'in_progress') return '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-900/40 text-blue-400">In Progress</span>';
   if (s === 'closed')      return '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-green-900/40 text-green-400">Closed</span>';
   return '—';
+}
+
+function renderBarChart() {
+  // Filter items by chartDC
+  const chartItems = chartDC ? allItems.filter(i => i.dc === chartDC) : allItems;
+  
+  // Group by cell
+  const cellData = {};
+  chartItems.forEach(item => {
+    const cell = item.cell || 'Unknown';
+    if (!cellData[cell]) {
+      cellData[cell] = { open: 0, in_progress: 0, closed: 0, total: 0 };
+    }
+    cellData[cell][item.status] = (cellData[cell][item.status] || 0) + 1;
+    cellData[cell].total++;
+  });
+
+  // Sort cells
+  const sortedCells = Object.keys(cellData).sort();
+  
+  if (sortedCells.length === 0) {
+    return '<div class="text-center py-8 text-dark-muted text-sm">No data to display</div>';
+  }
+
+  // Find max for scaling
+  const maxTotal = Math.max(...Object.values(cellData).map(d => d.total));
+  
+  return `
+    <div class="space-y-3">
+      ${sortedCells.map(cell => {
+        const data = cellData[cell];
+        const openPct = (data.open / data.total) * 100;
+        const inProgPct = (data.in_progress / data.total) * 100;
+        const closedPct = (data.closed / data.total) * 100;
+        const barWidth = (data.total / maxTotal) * 100;
+        
+        return `
+          <div class="flex items-center gap-3">
+            <div class="w-20 sm:w-24 text-xs font-semibold text-dark-text flex-shrink-0">
+              ${cell === 'Unknown' ? '<span class="text-dark-muted">No Cell</span>' : `Cell ${cell}`}
+            </div>
+            <div class="flex-1">
+              <div class="relative h-8 bg-dark-surface rounded-lg overflow-hidden" style="width: ${barWidth}%; min-width: 60px;">
+                ${data.open > 0 ? `
+                <div class="absolute left-0 top-0 h-full bg-yellow-600 flex items-center justify-center text-xs font-bold text-white" 
+                     style="width: ${openPct}%" title="${data.open} Open">
+                  ${data.open > 0 && openPct > 15 ? data.open : ''}
+                </div>` : ''}
+                ${data.in_progress > 0 ? `
+                <div class="absolute top-0 h-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white" 
+                     style="left: ${openPct}%; width: ${inProgPct}%" title="${data.in_progress} In Progress">
+                  ${data.in_progress > 0 && inProgPct > 15 ? data.in_progress : ''}
+                </div>` : ''}
+                ${data.closed > 0 ? `
+                <div class="absolute top-0 h-full bg-green-600 flex items-center justify-center text-xs font-bold text-white" 
+                     style="left: ${openPct + inProgPct}%; width: ${closedPct}%" title="${data.closed} Closed">
+                  ${data.closed > 0 && closedPct > 15 ? data.closed : ''}
+                </div>` : ''}
+              </div>
+            </div>
+            <div class="w-12 text-right text-xs font-semibold text-dark-muted flex-shrink-0">
+              ${data.total}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+    
+    <!-- Legend -->
+    <div class="flex flex-wrap items-center justify-center gap-4 mt-4 pt-3 border-t border-dark-border text-xs">
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-4 bg-yellow-600 rounded"></div>
+        <span class="text-dark-muted">Open</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-4 bg-blue-600 rounded"></div>
+        <span class="text-dark-muted">In Progress</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-4 bg-green-600 rounded"></div>
+        <span class="text-dark-muted">Closed</span>
+      </div>
+    </div>
+  `;
 }
 
 function rowBg(item) {

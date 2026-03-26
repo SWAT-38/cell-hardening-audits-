@@ -50,10 +50,13 @@ async function loadActionItems() {
 }
 
 function renderPage() {
-  const open   = allItems.filter(i => i.status === 'open').length;
-  const inProg = allItems.filter(i => i.status === 'in_progress').length;
-  const closed = allItems.filter(i => i.status === 'closed').length;
-  const high   = allItems.filter(i => i.priority === 'high' && i.status !== 'closed').length;
+  // Apply DC filter for summary metrics
+  const dcFilteredItems = filterDC ? allItems.filter(i => i.dc === filterDC) : allItems;
+  
+  const open   = dcFilteredItems.filter(i => i.status === 'open').length;
+  const inProg = dcFilteredItems.filter(i => i.status === 'in_progress').length;
+  const closed = dcFilteredItems.filter(i => i.status === 'closed').length;
+  const high   = dcFilteredItems.filter(i => i.priority === 'high' && i.status !== 'closed').length;
 
   let filtered = allItems.filter(i => {
     if (filterDC       && i.dc        !== filterDC)       return false;
@@ -77,8 +80,8 @@ function renderPage() {
     <!-- Summary Cards -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
       <div class="bg-dark-card rounded-xl border border-dark-border p-4 text-center">
-        <div class="text-2xl font-bold text-walmart-spark">${allItems.length}</div>
-        <div class="text-xs text-dark-muted mt-1">Total Items</div>
+        <div class="text-2xl font-bold text-walmart-spark">${dcFilteredItems.length}</div>
+        <div class="text-xs text-dark-muted mt-1">Total Items${filterDC ? ` (DC ${filterDC})` : ''}</div>
       </div>
       <div class="bg-dark-card rounded-xl border border-dark-border p-4 text-center">
         <div class="text-2xl font-bold text-yellow-400">${open}</div>

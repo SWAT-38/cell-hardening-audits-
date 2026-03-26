@@ -338,7 +338,7 @@ function renderBarChart() {
               </div>
             </div>
           </div>
-        `;}
+        `;
       }).join('')}
     </div>
     

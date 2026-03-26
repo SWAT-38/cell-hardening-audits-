@@ -168,6 +168,7 @@ function renderPage() {
             <th class="px-3 py-3 whitespace-nowrap">Created</th>
             <th class="px-3 py-3 whitespace-nowrap">Created By</th>
             <th class="px-3 py-3 whitespace-nowrap">Completed</th>
+            <th class="px-3 py-3 whitespace-nowrap">Days Open</th>
             <th class="px-3 py-3 whitespace-nowrap">Status</th>
             <th class="px-3 py-3 whitespace-nowrap">Resolution</th>
             <th class="px-3 py-3 whitespace-nowrap">Pic</th>
@@ -180,7 +181,7 @@ function renderPage() {
         </thead>
         <tbody class="divide-y divide-dark-border">
           ${filtered.length === 0 ? `
-          <tr><td colspan="20" class="text-center py-12 text-dark-muted">No action items found</td></tr>` :
+          <tr><td colspan="21" class="text-center py-12 text-dark-muted">No action items found</td></tr>` :
           filtered.map((item, idx) => renderDesktopRow(item, idx + 1)).join('')}
         </tbody>
       </table>
@@ -206,6 +207,52 @@ function statusBadge(s) {
   if (s === 'in_progress') return '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-900/40 text-blue-400">In Progress</span>';
   if (s === 'closed')      return '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-green-900/40 text-green-400">Closed</span>';
   return '—';
+}
+
+function calculateDaysOpen(item) {
+  if (!item.creation_date) return null;
+  
+  const startDate = new Date(item.creation_date);
+  let endDate;
+  
+  if (item.status === 'closed' && item.completed_date) {
+    endDate = new Date(item.completed_date);
+  } else {
+    endDate = new Date(); // Today
+  }
+  
+  const diffTime = Math.abs(endDate - startDate);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  return diffDays;
+}
+
+function daysOpenBadge(item) {
+  const days = calculateDaysOpen(item);
+  if (days === null) return '<span class="text-dark-muted">—</span>';
+  
+  let colorClass = '';
+  let icon = '';
+  
+  if (item.status === 'closed') {
+    // For closed items, just show days in neutral color
+    colorClass = 'bg-gray-900/40 text-gray-400';
+    icon = '✅';
+  } else {
+    // For open/in_progress, color code by age
+    if (days >= 30) {
+      colorClass = 'bg-red-900/40 text-red-400';
+      icon = '🔴';
+    } else if (days >= 14) {
+      colorClass = 'bg-yellow-900/40 text-yellow-400';
+      icon = '🟡';
+    } else {
+      colorClass = 'bg-green-900/40 text-green-400';
+      icon = '🟢';
+    }
+  }
+  
+  return `<span class="px-2 py-0.5 rounded-full text-xs font-bold ${colorClass}">${icon} ${days}d</span>`;
 }
 
 function renderBarChart() {
@@ -325,6 +372,7 @@ function renderDesktopRow(item, num) {
       <td class="px-3 py-2 whitespace-nowrap">${item.creation_date || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.created_by || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.completed_date || '—'}</td>
+      <td class="px-3 py-2 whitespace-nowrap">${daysOpenBadge(item)}</td>
       <td class="px-3 py-2 whitespace-nowrap">${statusBadge(item.status)}</td>
       <td class="px-3 py-2 max-w-[150px] text-dark-muted">${item.resolution_notes || '—'}</td>
       <td class="px-3 py-2">${photo}</td>
@@ -348,10 +396,11 @@ function renderMobileCard(item, num) {
   return `
     <div class="bg-dark-card rounded-xl border border-dark-border p-4 ${rowBg(item)}">
       <div class="flex items-start justify-between gap-2 mb-2">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
           <span class="text-xs font-mono text-dark-muted">#${num}</span>
           ${priorityBadge(item.priority)}
           ${statusBadge(item.status)}
+          ${daysOpenBadge(item)}
         </div>
         <div class="flex gap-2">
           <button onclick="editItem('${item.id}')" class="text-walmart-spark text-xs">✏️</button>

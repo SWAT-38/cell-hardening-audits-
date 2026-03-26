@@ -22,8 +22,8 @@ function renderNav() {
         </a>
         <a href="action-items.html" title="Action Items (Alt+I)"
            class="bg-dark-surface text-dark-text border border-dark-border font-semibold px-3 py-2 lg:px-4 rounded-lg hover:bg-dark-border transition text-sm">
-          <span class="sm:hidden">📋</span>
-          <span class="hidden sm:inline">📋 Action Items</span>
+          <span class="sm:hidden">🔧</span>
+          <span class="hidden sm:inline">🔧 Action Items</span>
         </a>
         <a href="new-audit.html" title="New Audit (Alt+N)"
            class="bg-walmart-spark text-wm-gray-160 font-semibold px-3 py-2 lg:px-4 rounded-lg hover:brightness-110 transition text-sm">

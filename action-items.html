@@ -36,15 +36,21 @@
                    class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-dark-muted mb-1">CELL</label>
-            <select id="f-cell" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
-              <option value="">Select cell...</option>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">DC #</label>
+            <select id="f-dc" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+              <option value="">Select DC...</option>
             </select>
           </div>
         </div>
 
         <!-- Row 2 -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">CELL</label>
+            <select id="f-cell" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+              <option value="">Select cell...</option>
+            </select>
+          </div>
           <div>
             <label class="block text-xs font-semibold text-dark-muted mb-1">PRIORITY *</label>
             <select id="f-priority" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
@@ -62,6 +68,13 @@
               <option value="closed">Closed</option>
             </select>
           </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+        <!-- Row 3 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label class="block text-xs font-semibold text-dark-muted mb-1">CELL TYPE</label>
             <select id="f-cell-type" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
@@ -71,10 +84,6 @@
               <option value="FLIB">FLIB</option>
             </select>
           </div>
-        </div>
-
-        <!-- Row 3 -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-dark-muted mb-1">OWNER</label>
             <input id="f-owner" type="text" placeholder="Owner name..."
@@ -101,6 +110,7 @@
           </div>
         </div>
 
+        <!-- Row 5 -->
         <!-- Row 5 -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>

@@ -5,6 +5,33 @@ let editingId = null;
 let modalPhotoData = null;
 let filterStatus = '';
 let filterPriority = '';
+let filterDC = '';
+
+const DC_LIST = [
+  { value: '6006', label: '6006 – Cullman, AL' },
+  { value: '6010', label: '6010 – Douglas, GA' },
+  { value: '6011', label: '6011 – Brookhaven, MS' },
+  { value: '6012', label: '6012 – Plainview, TX' },
+  { value: '6016', label: '6016 – New Braunfels, TX' },
+  { value: '6017', label: '6017 – Seymour, IN' },
+  { value: '6018', label: '6018 – Searcy, AR' },
+  { value: '6019', label: '6019 – Loveland, CO' },
+  { value: '6020', label: '6020 – Brooksville, FL' },
+  { value: '6021', label: '6021 – Porterville, CA' },
+  { value: '6023', label: '6023 – Sutherland, VA' },
+  { value: '6024', label: '6024 – Grove City, OH' },
+  { value: '6025', label: '6025 – Menomonie, WI' },
+  { value: '6026', label: '6026 – Red Bluff, CA' },
+  { value: '6027', label: '6027 – Woodland, PA' },
+  { value: '6030', label: '6030 – Raymond, NH' },
+  { value: '6031', label: '6031 – Buckeye, AZ' },
+  { value: '6035', label: '6035 – Ottawa, KS' },
+  { value: '6036', label: '6036 – Palestine, TX' },
+  { value: '6037', label: '6037 – Hermiston, OR' },
+  { value: '6038', label: '6038 – Marcy, NY' },
+  { value: '6039', label: '6039 – Midway, TN' },
+  { value: '6040', label: '6040 – Hope Mills, NC' },
+];
 
 async function loadActionItems() {
   try {
@@ -28,8 +55,9 @@ function renderPage() {
   const high   = allItems.filter(i => i.priority === 'high' && i.status !== 'closed').length;
 
   let filtered = allItems.filter(i => {
-    if (filterStatus   && i.status   !== filterStatus)   return false;
-    if (filterPriority && i.priority !== filterPriority) return false;
+    if (filterDC       && i.dc        !== filterDC)       return false;
+    if (filterStatus   && i.status    !== filterStatus)   return false;
+    if (filterPriority && i.priority  !== filterPriority) return false;
     return true;
   });
 
@@ -75,6 +103,13 @@ function renderPage() {
     <div class="bg-dark-card rounded-xl border border-dark-border p-4 mb-4">
       <div class="flex flex-wrap gap-3 items-end">
         <div>
+          <label class="block text-xs font-semibold text-dark-muted mb-1">DC #</label>
+          <select onchange="filterDC=this.value; renderPage()" class="bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+            <option value="">All DCs</option>
+            ${DC_LIST.map(dc => `<option value="${dc.value}" ${filterDC === dc.value ? 'selected' : ''}>${dc.label}</option>`).join('')}
+          </select>
+        </div>
+        <div>
           <label class="block text-xs font-semibold text-dark-muted mb-1">Filter by Status</label>
           <select onchange="filterStatus=this.value; renderPage()" class="bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
             <option value="">All Statuses</option>
@@ -92,8 +127,8 @@ function renderPage() {
             <option value="low" ${filterPriority==='low'?'selected':''}>&#128994; Low</option>
           </select>
         </div>
-        ${filterStatus || filterPriority ? `
-        <button onclick="filterStatus=''; filterPriority=''; renderPage()" class="px-4 py-2 text-sm rounded-lg border border-dark-border text-dark-muted hover:bg-dark-surface transition">
+        ${filterStatus || filterPriority || filterDC ? `
+        <button onclick="filterStatus=''; filterPriority=''; filterDC=''; renderPage()" class="px-4 py-2 text-sm rounded-lg border border-dark-border text-dark-muted hover:bg-dark-surface transition">
           &#10005; Clear Filters
         </button>` : ''}
         <div class="text-xs text-dark-muted ml-auto pt-4">Showing ${filtered.length} of ${allItems.length} items</div>
@@ -106,6 +141,7 @@ function renderPage() {
         <thead class="bg-dark-surface text-dark-muted uppercase tracking-wide">
           <tr>
             <th class="px-3 py-3 whitespace-nowrap">#</th>
+            <th class="px-3 py-3 whitespace-nowrap">DC</th>
             <th class="px-3 py-3 whitespace-nowrap">Action Item</th>
             <th class="px-3 py-3 whitespace-nowrap">Notes</th>
             <th class="px-3 py-3 whitespace-nowrap">Cell</th>
@@ -128,7 +164,7 @@ function renderPage() {
         </thead>
         <tbody class="divide-y divide-dark-border">
           ${filtered.length === 0 ? `
-          <tr><td colspan="19" class="text-center py-12 text-dark-muted">No action items found</td></tr>` :
+          <tr><td colspan="20" class="text-center py-12 text-dark-muted">No action items found</td></tr>` :
           filtered.map((item, idx) => renderDesktopRow(item, idx + 1)).join('')}
         </tbody>
       </table>
@@ -171,6 +207,7 @@ function renderDesktopRow(item, num) {
   return `
     <tr class="${bg} hover:bg-dark-surface/50 transition text-xs">
       <td class="px-3 py-2 font-mono text-dark-muted">${num}</td>
+      <td class="px-3 py-2 whitespace-nowrap font-semibold">${item.dc || '—'}</td>
       <td class="px-3 py-2 max-w-[200px]"><div class="font-semibold text-dark-text">${item.action_item || '—'}</div></td>
       <td class="px-3 py-2 max-w-[150px] text-dark-muted">${item.notes || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.cell || '—'}</td>
@@ -216,6 +253,7 @@ function renderMobileCard(item, num) {
       </div>
       <p class="font-semibold text-sm mb-2">${item.action_item || '—'}</p>
       <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-dark-muted">
+        ${item.dc ? `<div><span class="font-semibold">DC:</span> ${item.dc}</div>` : ''}
         ${item.cell ? `<div><span class="font-semibold">Cell:</span> ${item.cell}</div>` : ''}
         ${item.owner ? `<div><span class="font-semibold">Owner:</span> ${item.owner}</div>` : ''}
         ${item.assigned ? `<div><span class="font-semibold">Assigned:</span> ${item.assigned}</div>` : ''}
@@ -235,6 +273,13 @@ function openModal(id = null) {
   const item = id ? allItems.find(i => i.id === id) : null;
 
   document.getElementById('modal-title').textContent = id ? 'Edit Action Item' : 'Add Action Item';
+
+  // Populate DCs
+  const dcSel = document.getElementById('f-dc');
+  dcSel.innerHTML = '<option value="">Select DC...</option>';
+  DC_LIST.forEach(dc => {
+    dcSel.innerHTML += `<option value="${dc.value}" ${item?.dc === dc.value ? 'selected' : ''}>${dc.label}</option>`;
+  });
 
   // Populate cells
   const cellSel = document.getElementById('f-cell');
@@ -320,6 +365,7 @@ async function saveItem() {
   const data = {
     action_item:      actionItem,
     notes:            document.getElementById('f-notes').value.trim(),
+    dc:               document.getElementById('f-dc').value,
     cell:             document.getElementById('f-cell').value,
     priority,
     status:           document.getElementById('f-status').value,

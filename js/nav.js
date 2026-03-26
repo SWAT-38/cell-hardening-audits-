@@ -20,6 +20,11 @@ function renderNav() {
           <span class="sm:hidden">📖</span>
           <span class="hidden sm:inline">📖 Archive</span>
         </a>
+        <a href="action-items.html" title="Action Items (Alt+I)"
+           class="bg-dark-surface text-dark-text border border-dark-border font-semibold px-3 py-2 lg:px-4 rounded-lg hover:bg-dark-border transition text-sm">
+          <span class="sm:hidden">📋</span>
+          <span class="hidden sm:inline">📋 Action Items</span>
+        </a>
         <a href="new-audit.html" title="New Audit (Alt+N)"
            class="bg-walmart-spark text-wm-gray-160 font-semibold px-3 py-2 lg:px-4 rounded-lg hover:brightness-110 transition text-sm">
           <span class="sm:hidden">+</span>
@@ -84,6 +89,7 @@ function initKeyboardShortcuts() {
     if (e.altKey && e.key === 'n') { e.preventDefault(); window.location.href = 'new-audit.html'; }
     if (e.altKey && e.key === 'd') { e.preventDefault(); window.location.href = 'index.html'; }
     if (e.altKey && e.key === 'a') { e.preventDefault(); window.location.href = 'archive.html'; }
+    if (e.altKey && e.key === 'i') { e.preventDefault(); window.location.href = 'action-items.html'; }
   });
 }
 

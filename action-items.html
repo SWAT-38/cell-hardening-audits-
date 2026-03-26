@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Action Items – Cell Hardening</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+</head>
+<body class="h-full bg-dark-bg text-dark-text antialiased">
+  <div id="nav"></div>
+  <main class="max-w-full px-3 sm:px-6 py-6">
+    <div id="content">
+      <div class="text-center py-20 text-dark-muted">Loading action items…</div>
+    </div>
+  </main>
+
+  <!-- Add/Edit Modal -->
+  <div id="item-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-start justify-center p-4 overflow-y-auto">
+    <div class="bg-dark-card rounded-xl shadow-lg border border-dark-border w-full max-w-2xl my-4">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-dark-border">
+        <h2 id="modal-title" class="text-lg font-bold">Add Action Item</h2>
+        <button onclick="closeModal()" class="text-dark-muted hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+      <div class="p-6 space-y-4">
+
+        <!-- Row 1 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">ACTION ITEM *</label>
+            <input id="f-action-item" type="text" placeholder="Describe the action item..."
+                   class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">CELL</label>
+            <select id="f-cell" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+              <option value="">Select cell...</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">PRIORITY *</label>
+            <select id="f-priority" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+              <option value="">Select...</option>
+              <option value="low">🟢 Low</option>
+              <option value="medium">🟡 Medium</option>
+              <option value="high">🔴 High</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">STATUS *</label>
+            <select id="f-status" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+              <option value="open">Open</option>
+              <option value="in_progress">In Progress</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">CELL TYPE</label>
+            <select id="f-cell-type" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+              <option value="">Select...</option>
+              <option value="FT">FT</option>
+              <option value="PL">PL</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">OWNER</label>
+            <input id="f-owner" type="text" placeholder="Owner name..."
+                   class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">ASSIGNED TO</label>
+            <input id="f-assigned" type="text" placeholder="Assigned to..."
+                   class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          </div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">TICKET #</label>
+            <input id="f-ticket" type="text" placeholder="Ticket number..."
+                   class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">CREATED BY</label>
+            <input id="f-created-by" type="text" placeholder="Your name..."
+                   class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          </div>
+        </div>
+
+        <!-- Row 5 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">CREATION DATE</label>
+            <input id="f-creation-date" type="date"
+                   class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-dark-muted mb-1">COMPLETED DATE</label>
+            <input id="f-completed-date" type="date"
+                   class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          </div>
+        </div>
+
+        <!-- Row 6 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="flex items-center gap-3 pt-4">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input id="f-duplicated" type="checkbox" class="w-4 h-4 rounded accent-walmart-spark">
+              <span class="text-sm font-semibold">Duplicated</span>
+            </label>
+          </div>
+          <div class="flex items-center gap-3 pt-4">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input id="f-new-addition" type="checkbox" class="w-4 h-4 rounded accent-walmart-spark">
+              <span class="text-sm font-semibold">New Addition</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div>
+          <label class="block text-xs font-semibold text-dark-muted mb-1">NOTES</label>
+          <textarea id="f-notes" rows="2" placeholder="Additional notes..."
+                    class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark"></textarea>
+        </div>
+
+        <!-- Resolution Notes -->
+        <div>
+          <label class="block text-xs font-semibold text-dark-muted mb-1">RESOLUTION NOTES</label>
+          <textarea id="f-resolution" rows="2" placeholder="Resolution details..."
+                    class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark"></textarea>
+        </div>
+
+        <!-- Photo Upload -->
+        <div>
+          <label class="block text-xs font-semibold text-dark-muted mb-1">PICTURE</label>
+          <div class="flex items-center gap-3">
+            <label class="cursor-pointer bg-dark-surface border border-dark-border rounded-lg px-4 py-2 text-sm hover:bg-dark-border transition flex items-center gap-2">
+              📷 Upload Photo
+              <input id="f-photo" type="file" accept="image/*" class="hidden" onchange="previewModalPhoto(this)">
+            </label>
+            <div id="f-photo-preview" class="flex gap-2 flex-wrap"></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="px-6 py-4 border-t border-dark-border flex flex-col sm:flex-row gap-3 justify-end">
+        <button onclick="closeModal()" class="px-6 py-2 rounded-lg border border-dark-border text-dark-muted hover:bg-dark-surface transition text-sm">Cancel</button>
+        <button onclick="saveItem()" class="px-6 py-2 rounded-lg bg-walmart-spark text-dark-bg font-semibold hover:brightness-110 transition text-sm">Save Item</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/action-items.js"></script>
+</body>
+</html>

@@ -5,7 +5,7 @@ function renderNav() {
   <nav class="bg-dark-card text-white shadow-lg border-b border-dark-border">
     <div class="max-w-6xl lg:max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
       <a href="index.html" class="flex items-center gap-2 text-lg sm:text-xl font-bold tracking-tight hover:opacity-90 shrink-0">
-        <span class="text-walmart-spark text-2xl">🤖</span>
+        <span class="text-walmart-spark text-2xl">🔨</span>
         <span class="hidden sm:inline">Cell Hardening Audit</span>
         <span class="sm:hidden">Audit</span>
       </a>

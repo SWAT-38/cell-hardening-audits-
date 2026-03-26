@@ -150,13 +150,13 @@ function renderDashboard() {
           </tr>
         </thead>
         <tbody class="divide-y divide-dark-border">
-          ${allAudits.map((a, i) => renderDesktopRow(a, total - i)).join('')}
+          ${allAudits.map((a, i) => renderDesktopRow(a, i + 1)).join('')}
         </tbody>
       </table>
     </div>
     <!-- Mobile cards -->
     <div class="md:hidden space-y-3">
-      ${allAudits.map((a, i) => renderMobileCard(a, total - i)).join('')}
+      ${allAudits.map((a, i) => renderMobileCard(a, i + 1)).join('')}
     </div>`;
 }
 

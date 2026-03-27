@@ -40,7 +40,7 @@ async function loadActionItems() {
     snap.forEach(child => {
       allItems.push({ id: child.key, ...child.val() });
     });
-    allItems.sort((a, b) => (b.creation_date || '').localeCompare(a.creation_date || ''));
+    allItems.sort((a, b) => (a.creation_date || '').localeCompare(b.creation_date || ''));
     renderPage();
   } catch (err) {
     document.getElementById('content').innerHTML =

@@ -245,10 +245,10 @@ function daysOpenBadge(item) {
     icon = '✅';
   } else {
     // For open/in_progress, color code by age
-    if (days >= 30) {
+    if (days >= 5) {
       colorClass = 'bg-red-900/40 text-red-400';
       icon = '🔴';
-    } else if (days >= 14) {
+    } else if (days >= 3) {
       colorClass = 'bg-yellow-900/40 text-yellow-400';
       icon = '🟡';
     } else {

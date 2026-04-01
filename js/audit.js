@@ -102,7 +102,7 @@ function renderAudit() {
                   📷
                   <input type="file" accept="image/*" capture="environment" class="hidden" onchange="uploadPhoto(this, '${item.id}')">
                 </label>
-                <input type="text" value="${note}" placeholder="Add note..."
+                <input type="text" id="note-${item.id}" value="${note}" placeholder="Add note..."
                        onblur="saveNote('${cat.id}', '${item.id}', this.value)"
                        class="flex-1 bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-3 sm:py-2 text-base sm:text-sm sm:w-36 lg:w-44 focus:outline-none focus:ring-2 focus:ring-walmart-spark placeholder-dark-muted">
               </div>

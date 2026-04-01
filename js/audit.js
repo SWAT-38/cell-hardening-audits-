@@ -230,6 +230,20 @@ function viewPhotoFullScreen(photoId) {
 }
 
 async function saveResult(catId, itemId, result) {
+  // If N/A, force user to enter a comment
+  if (result === 'na') {
+    const comment = prompt('This item is marked N/A.\n\nPlease enter a reason why this item does not apply:');
+    if (!comment || !comment.trim()) {
+      alert('A comment is required when marking an item as N/A.');
+      return;
+    }
+    // Save the note first
+    await db.upsertNote(auditId, catId, itemId, comment.trim());
+    savedItems[itemId] = { ...(savedItems[itemId] || {}), item_id: itemId, note: comment.trim() };
+    // Update the note textarea on screen
+    const noteEl = document.getElementById(`note-${itemId}`);
+    if (noteEl) noteEl.value = comment.trim();
+  }
   await db.upsertItem(auditId, catId, itemId, result);
   savedItems[itemId] = { ...(savedItems[itemId] || {}), item_id: itemId, result };
   // Update row color

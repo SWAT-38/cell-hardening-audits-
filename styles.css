@@ -60,3 +60,147 @@
     opacity: 1;
   }
 }
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  /* Hide navigation, buttons, modals, footer */
+  #nav,
+  #footer,
+  #item-modal,
+  #dc-filter-wrap,
+  button[onclick*="exportPDF"],
+  button[onclick*="emailPDF"],
+  button[onclick*="copyDashboardLink"],
+  button[onclick*="openModal"],
+  button[onclick*="archiveAudit"],
+  button[onclick*="deleteAudit"],
+  button[onclick*="unarchiveAudit"],
+  button[onclick*="editItem"],
+  button[onclick*="deleteItem"],
+  button[onclick*="toggleStorageDetails"],
+  #storage-details,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset background to white, text to black */
+  body,
+  html {
+    background: #fff !important;
+    color: #111 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #content {
+    padding: 0 !important;
+  }
+
+  /* Cards & containers */
+  .bg-dark-card,
+  .bg-dark-surface,
+  .bg-dark-bg {
+    background: #fff !important;
+    border-color: #ddd !important;
+    box-shadow: none !important;
+  }
+
+  /* Text colors for print */
+  .text-dark-text,
+  .text-white,
+  .text-dark-muted {
+    color: #222 !important;
+  }
+
+  .text-walmart-spark {
+    color: #b8860b !important;
+  }
+
+  /* Table styles for print */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border: 1px solid #ccc !important;
+    padding: 6px 8px !important;
+    font-size: 10pt !important;
+    color: #111 !important;
+  }
+
+  th {
+    background: #f0f0f0 !important;
+    font-weight: bold !important;
+  }
+
+  /* Show desktop table, hide mobile cards */
+  .hidden.md\:block {
+    display: block !important;
+  }
+
+  .md\:hidden {
+    display: none !important;
+  }
+
+  /* Bar chart colors preserved */
+  .bg-yellow-500 { background-color: #eab308 !important; }
+  .bg-blue-500 { background-color: #3b82f6 !important; }
+  .bg-green-500 { background-color: #22c55e !important; }
+
+  /* Status badges */
+  .bg-green-900\/20,
+  .bg-green-900\/30,
+  .bg-green-900\/40 { background-color: #d4edda !important; }
+  .bg-red-90/20,
+  .bg-red-900\/30 { background-color: #f8d7da !important; }
+  .bg-yellow-900\/40 { background-color: #fff3cd !important; }
+
+  .text-green-400 { color: #198754 !important; }
+  .text-red-400, .text-red-300 { color: #dc3545 !important; }
+  .text-yellow-400 { color: #b8860b !important; }
+  .text-blue-400 { color: #0d6efd !important; }
+
+  /* Print header styling */
+  #print-header {
+    display: block !important;
+  }
+
+  #print-header h1 {
+    color: #333 !important;
+  }
+
+  /* Summary cards in grid */
+  .grid.grid-cols-2.md\:grid-cols-4 {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Border colors for print */
+  .border-dark-border {
+    border-color: #ddd !important;
+  }
+
+  /* Page breaks */
+  .bg-dark-card {
+    page-break-inside: avoid;
+  }
+
+  /* Ensure overflow content shows */
+  .overflow-x-auto,
+  .overflow-hidden {
+    overflow: visible !important;
+  }
+
+  @page {
+    size: landscape;
+    margin: 0.5in;
+  }
+}

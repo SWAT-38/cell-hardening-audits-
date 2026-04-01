@@ -71,9 +71,19 @@ function renderPage() {
         <h1 class="text-2xl font-bold">&#128203; Action Items</h1>
         <p class="text-sm text-dark-muted mt-1">Track open items and follow-ups</p>
       </div>
-      <button onclick="openModal()" class="w-full sm:w-auto bg-walmart-spark text-dark-bg font-semibold px-6 py-3 rounded-lg hover:brightness-110 active:brightness-90 transition text-sm flex items-center justify-center gap-2">
-        &#43; Add Action Item
-      </button>
+      <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+        <button onclick="openModal()" class="flex-1 sm:flex-none bg-walmart-spark text-dark-bg font-semibold px-4 py-3 rounded-lg hover:brightness-110 active:brightness-90 transition text-sm flex items-center justify-center gap-2">
+          &#43; Add Item
+        </button>
+        <button onclick="exportPDF('Action-Items.pdf')" 
+                class="flex-1 sm:flex-none bg-dark-surface text-dark-text border border-dark-border font-semibold px-4 py-3 rounded-lg hover:bg-dark-border transition text-sm flex items-center justify-center gap-2">
+          📄 Export PDF
+        </button>
+        <button onclick="emailPDF('Action-Items.pdf', 'Action Items Report')" 
+                class="flex-1 sm:flex-none bg-dark-surface text-dark-text border border-dark-border font-semibold px-4 py-3 rounded-lg hover:bg-dark-border transition text-sm flex items-center justify-center gap-2">
+          📧 Email PDF
+        </button>
+      </div>
     </div>
 
     <!-- Summary Cards -->

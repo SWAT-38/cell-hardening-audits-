@@ -65,10 +65,20 @@ function renderDashboard() {
           <h2 class="font-semibold text-base">Share Dashboard</h2>
           <p class="text-sm text-dark-muted mt-1">Copy link to share this dashboard with your team</p>
         </div>
-        <button id="copy-link-btn" onclick="copyDashboardLink()" 
-                class="w-full sm:w-auto bg-walmart-spark text-dark-bg font-semibold px-6 py-3 rounded-lg hover:brightness-110 active:brightness-90 transition text-sm flex items-center justify-center gap-2">
-          <span>🔗</span> Copy Link
-        </button>
+        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+          <button id="copy-link-btn" onclick="copyDashboardLink()" 
+                  class="flex-1 sm:flex-none bg-walmart-spark text-dark-bg font-semibold px-4 py-3 rounded-lg hover:brightness-110 active:brightness-90 transition text-sm flex items-center justify-center gap-2">
+            <span>🔗</span> Copy Link
+          </button>
+          <button onclick="exportPDF('Dashboard-Audits.pdf')" 
+                  class="flex-1 sm:flex-none bg-dark-surface text-dark-text border border-dark-border font-semibold px-4 py-3 rounded-lg hover:bg-dark-border transition text-sm flex items-center justify-center gap-2">
+            <span>📄</span> Export PDF
+          </button>
+          <button onclick="emailPDF('Dashboard-Audits.pdf', 'Cell Hardening Dashboard Report')" 
+                  class="flex-1 sm:flex-none bg-dark-surface text-dark-text border border-dark-border font-semibold px-4 py-3 rounded-lg hover:bg-dark-border transition text-sm flex items-center justify-center gap-2">
+            <span>📧</span> Email PDF
+          </button>
+        </div>
       </div>
     </div>`;
   

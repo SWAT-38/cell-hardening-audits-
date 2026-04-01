@@ -45,6 +45,26 @@ function renderArchive() {
 
   const total = allAudits.length;
   el.innerHTML = `
+    <!-- Export Buttons -->
+    <div class="bg-dark-card rounded-xl shadow border border-dark-border p-4 mb-4">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="font-semibold text-base">Export Archive</h2>
+          <p class="text-sm text-dark-muted mt-1">${total} archived audit${total !== 1 ? 's' : ''}</p>
+        </div>
+        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+          <button onclick="exportPDF('Archived-Audits.pdf')" 
+                  class="flex-1 sm:flex-none bg-dark-surface text-dark-text border border-dark-border font-semibold px-4 py-3 rounded-lg hover:bg-dark-border transition text-sm flex items-center justify-center gap-2">
+            <span>📄</span> Export PDF
+          </button>
+          <button onclick="emailPDF('Archived-Audits.pdf', 'Archived Audits Report')" 
+                  class="flex-1 sm:flex-none bg-dark-surface text-dark-text border border-dark-border font-semibold px-4 py-3 rounded-lg hover:bg-dark-border transition text-sm flex items-center justify-center gap-2">
+            <span>📧</span> Email PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Desktop table -->
     <div class="hidden md:block overflow-x-auto bg-dark-card rounded-xl shadow border border-dark-border">
       <table class="w-full text-left text-sm">

@@ -6,6 +6,7 @@ let modalPhotoData = null;
 let filterStatus = '';
 let filterPriority = '';
 let filterDC = '';
+let filterCell = '';
 
 const DC_LIST = [
   { value: '6006', label: '6006 – Cullman, AL' },
@@ -59,6 +60,7 @@ function renderPage() {
 
   let filtered = allItems.filter(i => {
     if (filterDC       && i.dc        !== filterDC)       return false;
+    if (filterCell     && i.cell      !== filterCell)     return false;
     if (filterStatus   && i.status    !== filterStatus)   return false;
     if (filterPriority && i.priority  !== filterPriority) return false;
     return true;
@@ -131,6 +133,13 @@ function renderPage() {
           </select>
         </div>
         <div>
+          <label class="block text-xs font-semibold text-dark-muted mb-1">Cell #</label>
+          <select onchange="filterCell=this.value; renderPage()" class="bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+            <option value="">All Cells</option>
+            ${CELL_OPTIONS.map(c => `<option value="${c}" ${filterCell === c ? 'selected' : ''}>Cell ${c}</option>`).join('')}
+          </select>
+        </div>
+        <div>
           <label class="block text-xs font-semibold text-dark-muted mb-1">Filter by Status</label>
           <select onchange="filterStatus=this.value; renderPage()" class="bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
             <option value="">All Statuses</option>
@@ -148,8 +157,8 @@ function renderPage() {
             <option value="low" ${filterPriority==='low'?'selected':''}>&#128994; Low</option>
           </select>
         </div>
-        ${filterStatus || filterPriority || filterDC ? `
-        <button onclick="filterStatus=''; filterPriority=''; filterDC=''; renderPage()" class="px-4 py-2 text-sm rounded-lg border border-dark-border text-dark-muted hover:bg-dark-surface transition">
+        ${filterStatus || filterPriority || filterDC || filterCell ? `
+        <button onclick="filterStatus=''; filterPriority=''; filterDC=''; filterCell=''; renderPage()" class="px-4 py-2 text-sm rounded-lg border border-dark-border text-dark-muted hover:bg-dark-surface transition">
           &#10005; Clear Filters
         </button>` : ''}
         <div class="text-xs text-dark-muted ml-auto pt-4">Showing ${filtered.length} of ${allItems.length} items</div>

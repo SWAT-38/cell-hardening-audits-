@@ -30,6 +30,14 @@ function renderNav() {
           <span class="sm:hidden">+</span>
           <span class="hidden sm:inline">+ New Audit</span>
         </a>
+        ${window.currentUser ? `
+        <div class="flex items-center gap-2 pl-2 border-l border-dark-border">
+          <span class="hidden lg:inline text-xs text-dark-muted truncate max-w-[160px]">${window.currentUser.email}</span>
+          <button onclick="authSignOut()" title="Sign Out"
+                  class="bg-dark-surface text-dark-muted border border-dark-border font-semibold px-3 py-2 rounded-lg hover:bg-dark-border hover:text-red-400 transition text-sm">
+            🚪
+          </button>
+        </div>` : ''}
       </div>
     </div>
   </nav>`;

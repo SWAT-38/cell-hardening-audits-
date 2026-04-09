@@ -82,23 +82,26 @@ function renderDashboard() {
       </div>
     </div>`;
   
-  // Storage usage indicator
   let storageHtml = '';
   if (storageUsage) {
-    const { totalMB, totalGB, percentUsed, photoCount } = storageUsage;
-    const barColor = percentUsed > 90 ? 'bg-red-500' : percentUsed > 70 ? 'bg-yellow-500' : 'bg-green-500';
+    const { totalMB, totalGB, percentUsed, photoCount, auditPhotoCount, actionPhotoCount, auditDataSize, actionItemsSize } = storageUsage;
+    const barColor  = percentUsed > 90 ? 'bg-red-500' : percentUsed > 70 ? 'bg-yellow-500' : 'bg-green-500';
     const textColor = percentUsed > 90 ? 'text-red-400' : percentUsed > 70 ? 'text-yellow-400' : 'text-green-400';
-    
+
+    // Breakdown bar segments (% of 1 GB cap)
+    const auditPct  = Math.min((auditDataSize  / (1024 * 1024 * 1024)) * 100, 100);
+    const actionPct = Math.min((actionItemsSize / (1024 * 1024 * 1024)) * 100, 100);
+
     storageHtml = `
       <div class="bg-dark-card rounded-xl shadow border border-dark-border mb-4 overflow-hidden">
         <!-- Header (always visible) -->
-        <button type="button" onclick="toggleStorageDetails()" 
+        <button type="button" onclick="toggleStorageDetails()"
                 class="w-full flex items-center justify-between px-4 py-3 hover:bg-dark-surface transition cursor-pointer">
           <div class="flex items-center gap-3">
             <span class="text-xl">💾</span>
             <h3 class="font-semibold">Storage Usage</h3>
             <span class="text-xs ${textColor} font-semibold">${percentUsed.toFixed(1)}%</span>
-            <span class="text-xs text-dark-muted">(• ${photoCount} photos)</span>
+            <span class="text-xs text-dark-muted">(${photoCount} photos total)</span>
           </div>
           <div class="flex items-center gap-3">
             <div class="hidden sm:flex items-center gap-2">
@@ -110,34 +113,45 @@ function renderDashboard() {
             <span id="storage-toggle-icon" class="text-dark-muted text-xl">▼</span>
           </div>
         </button>
-        
+
         <!-- Details (collapsible) -->
-        <div id="storage-details" class="hidden border-t border-dark-border p-4">
-          <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex-1 min-w-[200px]">
-              <div class="text-xs text-dark-muted mb-2">Firebase Free Tier: 1 GB Total</div>
-              <div class="flex items-center gap-3">
-                <div class="flex-1 bg-dark-surface rounded-full h-4 overflow-hidden">
-                  <div class="h-full rounded-full transition-all duration-300 ${barColor}" style="width:${Math.min(percentUsed, 100)}%"></div>
-                </div>
-                <span class="text-sm font-semibold ${textColor} whitespace-nowrap">
-                  ${percentUsed.toFixed(1)}%
-                </span>
-              </div>
+        <div id="storage-details" class="hidden border-t border-dark-border p-4 space-y-4">
+
+          <!-- Overall bar -->
+          <div>
+            <div class="flex items-center justify-between text-xs text-dark-muted mb-1">
+              <span>Firebase Free Tier: 1 GB Total</span>
+              <span class="font-semibold ${textColor}">${percentUsed.toFixed(1)}% used</span>
             </div>
-            <div class="flex gap-6 text-sm">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-walmart-spark">${totalMB < 1024 ? totalMB.toFixed(0) : totalGB.toFixed(2)}</div>
-                <div class="text-xs text-dark-muted">${totalMB < 1024 ? 'MB' : 'GB'} Used</div>
+            <div class="w-full bg-dark-surface rounded-full h-4 overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-300 ${barColor}" style="width:${Math.min(percentUsed, 100)}%"></div>
+            </div>
+          </div>
+
+          <!-- Breakdown by source -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            <div class="bg-dark-surface rounded-lg p-3 border border-dark-border">
+              <div class="text-xs font-semibold text-dark-muted uppercase tracking-wide mb-2">📋 Dashboard + Archive</div>
+              <div class="flex items-center gap-2 mb-1">
+                <div class="flex-1 bg-dark-border rounded-full h-1.5 overflow-hidden">
+                  <div class="h-full bg-blue-500 rounded-full" style="width:${Math.min(auditPct / (percentUsed / 100 || 1) * 100, 100)}%"></div>
+                </div>
               </div>
-              <div class="text-center">
-                <div class="text-2xl font-bold text-walmart-spark">${photoCount}</div>
-                <div class="text-xs text-dark-muted">Photos</div>
+              <div class="text-xs text-dark-muted">${(auditDataSize / (1024 * 1024)).toFixed(1)} MB &middot; ${auditPhotoCount} photos</div>
+            </div>
+            <div class="bg-dark-surface rounded-lg p-3 border border-dark-border">
+              <div class="text-xs font-semibold text-dark-muted uppercase tracking-wide mb-2">📌 Action Items</div>
+              <div class="flex items-center gap-2 mb-1">
+                <div class="flex-1 bg-dark-border rounded-full h-1.5 overflow-hidden">
+                  <div class="h-full bg-walmart-spark rounded-full" style="width:${Math.min(actionPct / (percentUsed / 100 || 1) * 100, 100)}%"></div>
+                </div>
               </div>
-              <div class="text-center">
-                <div class="text-2xl font-bold text-walmart-spark">${((1024 - totalMB) / 0.6).toFixed(0)}</div>
-                <div class="text-xs text-dark-muted">Photos Left</div>
-              </div>
+              <div class="text-xs text-dark-muted">${(actionItemsSize / (1024 * 1024)).toFixed(1)} MB &middot; ${actionPhotoCount} photos</div>
+            </div>
+            <div class="bg-dark-surface rounded-lg p-3 border border-dark-border">
+              <div class="text-xs font-semibold text-dark-muted uppercase tracking-wide mb-2">📦 Total Used</div>
+              <div class="text-2xl font-bold text-walmart-spark">${totalMB < 1024 ? totalMB.toFixed(0) + ' MB' : totalGB.toFixed(2) + ' GB'}</div>
+              <div class="text-xs text-dark-muted mt-1">${photoCount} photos &middot; ~${((1024 - totalMB) / 0.6).toFixed(0)} photos remaining</div>
             </div>
           </div>
         </div>

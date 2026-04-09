@@ -199,53 +199,66 @@ const db = {
   // ── Helpers ────────────────────────────────────────────
   async getStorageUsage() {
     try {
-      console.log('📊 Calculating storage usage...');
-      
-      // Get all audits
+      console.log('📊 Calculating storage usage (all sources)...');
+
+      // ── Audits (dashboard + archive live here) ──────────────
       const auditsSnapshot = await database.ref('audits').once('value');
       const auditsSize = JSON.stringify(auditsSnapshot.val() || {}).length;
-      
-      // Get all audit items
+
+      // ── Audit checklist items ────────────────────────────────
       const itemsSnapshot = await database.ref('audit_items').once('value');
       const itemsSize = JSON.stringify(itemsSnapshot.val() || {}).length;
-      
-      // Get all photos (this is the big one)
+
+      // ── Audit photos (stored separately as base64 data_url) ──
       const photosSnapshot = await database.ref('audit_photos').once('value');
-      let photosSize = 0;
-      let photoCount = 0;
-      
+      let auditPhotosSize = 0;
+      let auditPhotoCount = 0;
       photosSnapshot.forEach(auditPhotos => {
         auditPhotos.forEach(photo => {
-          const photoData = photo.val();
-          if (photoData.data_url) {
-            photosSize += photoData.data_url.length;
-            photoCount++;
+          const data = photo.val();
+          if (data.data_url) {
+            auditPhotosSize += data.data_url.length;
+            auditPhotoCount++;
           }
         });
       });
-      
-      const totalBytes = auditsSize + itemsSize + photosSize;
-      const totalMB = totalBytes / (1024 * 1024);
-      const totalGB = totalMB / 1024;
+
+      // ── Action items (photos embedded inline in the record) ──
+      const actionSnap = await database.ref('action_items').once('value');
+      let actionItemsSize = 0;
+      let actionPhotoCount = 0;
+      actionSnap.forEach(child => {
+        const item = child.val();
+        actionItemsSize += JSON.stringify(item).length;
+        if (item.photo) actionPhotoCount++;
+      });
+
+      const photoCount  = auditPhotoCount + actionPhotoCount;
+      const totalBytes  = auditsSize + itemsSize + auditPhotosSize + actionItemsSize;
+      const totalMB     = totalBytes / (1024 * 1024);
+      const totalGB     = totalMB / 1024;
       const percentUsed = (totalGB / 1) * 100; // 1 GB free tier
-      
+
       console.log('✅ Storage calculated:', {
-        auditsSize: Math.round(auditsSize / 1024) + ' KB',
-        itemsSize: Math.round(itemsSize / 1024) + ' KB',
-        photosSize: Math.round(photosSize / (1024 * 1024)) + ' MB',
+        audits:      Math.round(auditsSize / 1024) + ' KB',
+        auditItems:  Math.round(itemsSize / 1024) + ' KB',
+        auditPhotos: Math.round(auditPhotosSize / (1024 * 1024)) + ' MB',
+        actionItems: Math.round(actionItemsSize / (1024 * 1024)) + ' MB',
         photoCount,
         totalMB: totalMB.toFixed(2) + ' MB',
-        percentUsed: percentUsed.toFixed(1) + '%'
+        percentUsed: percentUsed.toFixed(1) + '%',
       });
-      
+
       return {
         totalBytes,
         totalMB,
         totalGB,
         percentUsed,
         photoCount,
-        photosSize,
-        auditDataSize: auditsSize + itemsSize
+        auditPhotoCount,
+        actionPhotoCount,
+        auditDataSize:   auditsSize + itemsSize + auditPhotosSize,
+        actionItemsSize,
       };
     } catch (err) {
       console.error('❌ Storage calculation error:', err);

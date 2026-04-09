@@ -15,16 +15,19 @@
 
   function friendlyError(code) {
     const map = {
-      'auth/user-not-found':        'No account found with that email.',
-      'auth/wrong-password':        'Incorrect password. Try again.',
-      'auth/invalid-credential':    'Incorrect email or password.',
-      'auth/email-already-in-use':  'An account already exists with that email.',
-      'auth/too-many-requests':     'Too many attempts. Please try again later.',
-      'auth/invalid-email':         'Invalid email address.',
-      'auth/weak-password':         'Password must be at least 6 characters.',
-      'auth/network-request-failed':'Network error. Check your connection.',
+      'auth/operation-not-allowed':  '⚙️ Email/Password sign-in is not enabled yet. Go to Firebase Console → Authentication → Sign-in method → Enable Email/Password.',
+      'auth/user-not-found':         'No account found with that email. Use "Create Account" to register first.',
+      'auth/wrong-password':         'Incorrect password. Try again.',
+      'auth/invalid-credential':     'Incorrect email or password. Try again.',
+      'auth/email-already-in-use':   'An account already exists with that email. Sign in instead.',
+      'auth/too-many-requests':      'Too many attempts. Please wait a few minutes and try again.',
+      'auth/invalid-email':          'Invalid email address.',
+      'auth/weak-password':          'Password must be at least 6 characters.',
+      'auth/network-request-failed': 'Network error. Check your connection and try again.',
+      'auth/user-disabled':          'This account has been disabled. Contact your admin.',
     };
-    return map[code] || 'Something went wrong. Please try again.';
+    console.error('🔐 Auth error:', code);
+    return map[code] || `Sign-in failed (${code}). Check the browser console (F12) for details.`;
   }
 
   // ── Overlay UI ────────────────────────────────────────────────────────────

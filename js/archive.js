@@ -2,6 +2,8 @@
 
 let allAudits = [];
 let allNotes = {};
+let filterDC = '';
+let filterStatus = '';
 
 async function loadArchive() {
   try {
@@ -34,16 +36,35 @@ function renderArchive() {
 
   const dcs = [...new Set(allAudits.map(a => a.location).filter(Boolean))].sort();
   document.getElementById('dc-filter-wrap').innerHTML = `
-    <div>
-      <label for="dc-filter" class="block text-xs font-semibold text-dark-muted mb-1">Filter by DC</label>
-      <select id="dc-filter" onchange="filterByDC(this.value)"
-              class="bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
-        <option value="">All DCs</option>
-        ${dcs.map(dc => `<option value="${dc}">${dc}</option>`).join('')}
-      </select>
+    <div class="flex flex-wrap gap-3 items-end">
+      <div>
+        <label class="block text-xs font-semibold text-dark-muted mb-1">Filter by DC</label>
+        <select onchange="applyFilters(this.value, filterStatus)"
+                class="bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          <option value="">All DCs</option>
+          ${dcs.map(dc => `<option value="${dc}" ${filterDC === dc ? 'selected' : ''}>${dc}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-dark-muted mb-1">Filter by Status</label>
+        <select onchange="applyFilters(filterDC, this.value)"
+                class="bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          <option value="">All Statuses</option>
+          <option value="pass"      ${filterStatus === 'pass'          ? 'selected' : ''}>✅ Pass</option>
+          <option value="fail"      ${filterStatus === 'fail'          ? 'selected' : ''}>❌ Fail</option>
+          <option value="critical_fail" ${filterStatus === 'critical_fail' ? 'selected' : ''}>🚨 Critical Fail</option>
+          <option value="in_progress"   ${filterStatus === 'in_progress'   ? 'selected' : ''}>🟡 In Progress</option>
+        </select>
+      </div>
+      ${filterDC || filterStatus ? `<button onclick="applyFilters('', '')" class="px-4 py-2 text-sm rounded-lg border border-dark-border text-dark-muted hover:bg-dark-surface transition">✕ Clear</button>` : ''}
     </div>`;
 
-  const total = allAudits.length;
+  const filtered = allAudits.filter(a => {
+    if (filterDC     && a.location !== filterDC)     return false;
+    if (filterStatus && a.status   !== filterStatus) return false;
+    return true;
+  });
+  const total = filtered.length;
   el.innerHTML = `
     <!-- Export Buttons -->
     <div class="bg-dark-card rounded-xl shadow border border-dark-border p-4 mb-4">
@@ -81,13 +102,13 @@ function renderArchive() {
           </tr>
         </thead>
         <tbody class="divide-y divide-dark-border">
-          ${allAudits.map((a, i) => renderDesktopRow(a, i + 1)).join('')}
+          ${filtered.map((a, i) => renderDesktopRow(a, i + 1)).join('')}
         </tbody>
       </table>
     </div>
     <!-- Mobile cards -->
     <div class="md:hidden space-y-3">
-      ${allAudits.map((a, i) => renderMobileCard(a, i + 1)).join('')}
+      ${filtered.map((a, i) => renderMobileCard(a, i + 1)).join('')}
     </div>`;
 }
 
@@ -161,13 +182,10 @@ function toggleNotes(id) {
   document.getElementById(id)?.classList.toggle('hidden');
 }
 
-function filterByDC(dc) {
-  document.querySelectorAll('.audit-row').forEach(row => {
-    row.classList.toggle('hidden', dc && row.dataset.dc !== dc);
-  });
-  document.querySelectorAll('.audit-notes').forEach(row => {
-    if (dc && row.dataset.dc !== dc) row.classList.add('hidden');
-  });
+function applyFilters(dc, status) {
+  filterDC = dc;
+  filterStatus = status;
+  renderArchive();
 }
 
 async function unarchiveAudit(id) {

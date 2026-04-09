@@ -46,7 +46,7 @@ function renderStatusBadge(status) {
   const badges = {
     pass: '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-900/40 text-green-400">✅ Pass</span>',
     fail: '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-900/40 text-red-400">❌ Fail</span>',
-    critical_fail: '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-900/60 text-red-300">🚨 Critical</span>',
+    critical_fail: '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-900/40 text-red-400">❌ Fail</span>',
     in_progress: '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-900/40 text-yellow-400">🟡 In Progress</span>',
   };
   return badges[status] || badges.in_progress;

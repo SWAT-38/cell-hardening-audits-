@@ -35,7 +35,7 @@ async function loadReport() {
 function renderReport(audit, saved, photoMap, progress) {
   // Status banner
   const banners = {
-    critical_fail: '<div class="bg-red-600 text-white rounded-xl p-5 mb-6 text-center"><p class="text-3xl font-bold">\ud83d\udea8 CRITICAL FAIL</p><p class="mt-1">One or more safety-critical items failed. Immediate corrective action required.</p></div>',
+    critical_fail: '<div class="bg-red-600 text-white rounded-xl p-5 mb-6 text-center"><p class="text-3xl font-bold">\u274c FAIL</p><p class="mt-1">One or more items failed. Immediate corrective action required.</p></div>',
     fail: '<div class="bg-wm-red text-white rounded-xl p-5 mb-6 text-center"><p class="text-3xl font-bold">\u274c FAIL</p><p class="mt-1">One or more checklist items did not pass.</p></div>',
     pass: '<div class="bg-wm-green text-white rounded-xl p-5 mb-6 text-center"><p class="text-3xl font-bold">\u2705 PASS</p><p class="mt-1">All checklist items passed or were marked N/A.</p></div>',
   };

@@ -50,18 +50,17 @@ function renderArchive() {
         <select onchange="applyFilters(filterDC, this.value)"
                 class="bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
           <option value="">All Statuses</option>
-          <option value="pass"      ${filterStatus === 'pass'          ? 'selected' : ''}>✅ Pass</option>
-          <option value="fail"      ${filterStatus === 'fail'          ? 'selected' : ''}>❌ Fail</option>
-          <option value="critical_fail" ${filterStatus === 'critical_fail' ? 'selected' : ''}>🚨 Critical Fail</option>
-          <option value="in_progress"   ${filterStatus === 'in_progress'   ? 'selected' : ''}>🟡 In Progress</option>
+          <option value="pass" ${filterStatus === 'pass' ? 'selected' : ''}>✅ Pass</option>
+          <option value="fail" ${filterStatus === 'fail' ? 'selected' : ''}>❌ Fail</option>
         </select>
       </div>
       ${filterDC || filterStatus ? `<button onclick="applyFilters('', '')" class="px-4 py-2 text-sm rounded-lg border border-dark-border text-dark-muted hover:bg-dark-surface transition">✕ Clear</button>` : ''}
     </div>`;
 
   const filtered = allAudits.filter(a => {
-    if (filterDC     && a.location !== filterDC)     return false;
-    if (filterStatus && a.status   !== filterStatus) return false;
+    if (filterDC && a.location !== filterDC) return false;
+    if (filterStatus === 'fail' && a.status !== 'fail' && a.status !== 'critical_fail') return false;
+    if (filterStatus === 'pass' && a.status !== 'pass') return false;
     return true;
   });
   const total = filtered.length;

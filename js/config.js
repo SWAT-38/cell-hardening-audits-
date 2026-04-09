@@ -11,16 +11,11 @@ const firebaseConfig = {
 
 // Initialize Firebase
 let database = null;
-let storage = null;
 
 try {
   firebase.initializeApp(firebaseConfig);
   database = firebase.database();
-  storage = firebase.storage();
   console.log('✅ Firebase initialized successfully');
-  console.log('📡 Database URL:', firebaseConfig.databaseURL);
-  console.log('💾 Storage bucket:', firebaseConfig.storageBucket);
-  console.log('🔍 Storage object:', storage ? 'Available' : 'NOT AVAILABLE');
 } catch (e) {
   console.error('❌ Firebase initialization error:', e);
 }

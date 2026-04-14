@@ -379,9 +379,23 @@ function rowBg(item) {
 
 function renderDesktopRow(item, num) {
   const bg = rowBg(item);
-  const photo = item.photo
-    ? `<img src="${item.photo}" onclick="viewActionPhoto('${item.id}')" class="w-10 h-10 object-cover rounded cursor-pointer hover:ring-2 hover:ring-walmart-spark">`
+  const thumbCell = item.photo
+    ? `<img src="${item.photo}" onclick="toggleItemPhoto('${item.id}')" title="Click to expand"
+           class="w-10 h-10 object-cover rounded cursor-pointer hover:ring-2 hover:ring-walmart-spark transition">`
     : '<span class="text-dark-muted">—</span>';
+
+  const photoRow = item.photo ? `
+    <tr id="photo-row-${item.id}" class="hidden ${bg}">
+      <td colspan="20" class="px-4 pb-4 pt-1">
+        <div class="flex items-start gap-3">
+          <img src="${item.photo}"
+               class="max-h-80 max-w-xl rounded-xl border border-dark-border object-contain shadow-lg">
+          <button onclick="toggleItemPhoto('${item.id}')"
+                  class="text-dark-muted hover:text-white text-xl leading-none mt-1" title="Close">✕</button>
+        </div>
+      </td>
+    </tr>` : '';
+
   return `
     <tr class="${bg} hover:bg-dark-surface/50 transition text-xs">
       <td class="px-3 py-2 font-mono text-dark-muted">${num}</td>
@@ -398,7 +412,7 @@ function renderDesktopRow(item, num) {
       <td class="px-3 py-2 whitespace-nowrap">${daysOpenBadge(item)}</td>
       <td class="px-3 py-2 whitespace-nowrap">${statusBadge(item.status)}</td>
       <td class="px-3 py-2 max-w-[150px] text-dark-muted">${item.resolution_notes || '—'}</td>
-      <td class="px-3 py-2">${photo}</td>
+      <td class="px-3 py-2">${thumbCell}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.cell_type || '—'}</td>
       <td class="px-3 py-2 text-center">${item.duplicated ? '✅' : '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.cell_type || '—'}</td>
@@ -409,13 +423,19 @@ function renderDesktopRow(item, num) {
           <button onclick="deleteItem('${item.id}')" class="text-red-400 hover:underline text-xs">🗑️</button>
         </div>
       </td>
-    </tr>`;
+    </tr>${photoRow}`;
 }
 
 function renderMobileCard(item, num) {
-  const photo = item.photo
-    ? `<img src="${item.photo}" onclick="viewActionPhoto('${item.id}')" class="w-16 h-16 object-cover rounded-lg cursor-pointer hover:ring-2 hover:ring-walmart-spark">`
-    : '';
+  const photo = item.photo ? `
+    <div>
+      <img src="${item.photo}" onclick="toggleItemPhoto('${item.id}')" title="Click to expand"
+           class="w-16 h-16 object-cover rounded-lg cursor-pointer hover:ring-2 hover:ring-walmart-spark transition">
+      <div id="photo-expand-${item.id}" class="hidden mt-3">
+        <img src="${item.photo}" class="w-full rounded-xl border border-dark-border object-contain shadow-lg">
+        <button onclick="toggleItemPhoto('${item.id}')" class="mt-2 text-xs text-dark-muted hover:text-white transition">✕ Close</button>
+      </div>
+    </div>` : '';
   return `
     <div class="bg-dark-card rounded-xl border border-dark-border p-4 ${rowBg(item)}">
       <div class="flex items-start justify-between gap-2 mb-2">
@@ -589,21 +609,13 @@ async function deleteItem(id) {
   await loadActionItems();
 }
 
-function viewActionPhoto(id) {
-  const item = allItems.find(i => i.id === id);
-  if (!item?.photo) return;
-
-  const overlay = document.createElement('div');
-  overlay.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4';
-  overlay.onclick = () => overlay.remove();
-  overlay.innerHTML = `
-    <div class="relative max-w-full max-h-full">
-      <img src="${item.photo}" class="max-w-full max-h-screen object-contain" onclick="event.stopPropagation()">
-      <button onclick="this.parentElement.parentElement.remove()"
-              class="absolute top-4 right-4 bg-red-600 text-white rounded-full w-10 h-10 text-2xl font-bold hover:bg-red-700 transition">&times;</button>
-      <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-4 py-2 rounded-lg text-sm">Click anywhere to close</div>
-    </div>`;
-  document.body.appendChild(overlay);
+function toggleItemPhoto(id) {
+  // Desktop — expand row beneath the item row
+  const desktopRow = document.getElementById(`photo-row-${id}`);
+  if (desktopRow) desktopRow.classList.toggle('hidden');
+  // Mobile — expand panel inside the card
+  const mobileExpand = document.getElementById(`photo-expand-${id}`);
+  if (mobileExpand) mobileExpand.classList.toggle('hidden');
 }
 
 // Close modal on ESC key

@@ -1,10 +1,12 @@
 // Action Items page logic
 
 let allItems = [];
-let editingId     = null;
-let modalPhotoData = null;
-let inlineEditId  = null;
-let inlinePhotoData = null;
+let editingId      = null;
+let modalPhotoData  = null;
+let modalPhotoData2 = null;
+let inlineEditId   = null;
+let inlinePhotoData  = null;
+let inlinePhotoData2 = null;
 
 // Keep in sync with the ACTION ITEM select options in action-items.html
 const ACTION_ITEM_OPTIONS = [
@@ -393,19 +395,25 @@ function rowBg(item) {
 
 function renderDesktopRow(item, num) {
   const bg = rowBg(item);
-  const thumbCell = item.photo
-    ? `<img src="${item.photo}" onclick="toggleItemPhoto('${item.id}')" title="Click to expand"
-           class="w-10 h-10 object-cover rounded cursor-pointer hover:ring-2 hover:ring-walmart-spark transition">`
+  const hasPhoto = item.photo || item.photo2;
+  const thumbCell = hasPhoto
+    ? `<div class="flex gap-1">
+        ${item.photo  ? `<img src="${item.photo}"  onclick="toggleItemPhoto('${item.id}')" title="Action Item Photo — click to expand"
+             class="w-10 h-10 object-cover rounded cursor-pointer hover:ring-2 hover:ring-walmart-spark transition">` : ''}
+        ${item.photo2 ? `<img src="${item.photo2}" onclick="toggleItemPhoto('${item.id}')" title="Resolution Photo — click to expand"
+             class="w-10 h-10 object-cover rounded cursor-pointer hover:ring-2 hover:ring-blue-400 transition">` : ''}
+      </div>`
     : '<span class="text-dark-muted">—</span>';
 
-  const photoRow = item.photo ? `
+  const photoRow = hasPhoto ? `
     <tr id="photo-row-${item.id}" class="hidden ${bg}">
       <td colspan="20" class="px-4 pb-4 pt-1">
-        <div class="flex items-start gap-3">
-          <img src="${item.photo}"
-               class="max-h-80 max-w-xl rounded-xl border border-dark-border object-contain shadow-lg">
-          <button onclick="toggleItemPhoto('${item.id}')"
-                  class="text-dark-muted hover:text-white text-xl leading-none mt-1" title="Close">✕</button>
+        <div class="flex flex-wrap items-start gap-6">
+          ${item.photo  ? `<div><p class="text-xs font-semibold text-dark-muted mb-1">&#128247; Action Item Photo</p>
+            <img src="${item.photo}" class="max-h-72 max-w-sm rounded-xl border border-dark-border object-contain shadow-lg"></div>` : ''}
+          ${item.photo2 ? `<div><p class="text-xs font-semibold text-dark-muted mb-1">&#128247; Resolution Photo</p>
+            <img src="${item.photo2}" class="max-h-72 max-w-sm rounded-xl border border-dark-border object-contain shadow-lg"></div>` : ''}
+          <button onclick="toggleItemPhoto('${item.id}')" class="text-dark-muted hover:text-white text-xl leading-none self-start" title="Close">✕</button>
         </div>
       </td>
     </tr>` : '';
@@ -441,13 +449,21 @@ function renderDesktopRow(item, num) {
 }
 
 function renderMobileCard(item, num) {
-  const photo = item.photo ? `
+  const hasPhoto = item.photo || item.photo2;
+  const photo = hasPhoto ? `
     <div>
-      <img src="${item.photo}" onclick="toggleItemPhoto('${item.id}')" title="Click to expand"
-           class="w-16 h-16 object-cover rounded-lg cursor-pointer hover:ring-2 hover:ring-walmart-spark transition">
-      <div id="photo-expand-${item.id}" class="hidden mt-3">
-        <img src="${item.photo}" class="w-full rounded-xl border border-dark-border object-contain shadow-lg">
-        <button onclick="toggleItemPhoto('${item.id}')" class="mt-2 text-xs text-dark-muted hover:text-white transition">✕ Close</button>
+      <div class="flex gap-2">
+        ${item.photo  ? `<img src="${item.photo}"  onclick="toggleItemPhoto('${item.id}')" title="Action Item Photo"
+             class="w-16 h-16 object-cover rounded-lg cursor-pointer hover:ring-2 hover:ring-walmart-spark transition">` : ''}
+        ${item.photo2 ? `<img src="${item.photo2}" onclick="toggleItemPhoto('${item.id}')" title="Resolution Photo"
+             class="w-16 h-16 object-cover rounded-lg cursor-pointer hover:ring-2 hover:ring-blue-400 transition">` : ''}
+      </div>
+      <div id="photo-expand-${item.id}" class="hidden mt-3 space-y-3">
+        ${item.photo  ? `<div><p class="text-xs font-semibold text-dark-muted mb-1">&#128247; Action Item Photo</p>
+          <img src="${item.photo}"  class="w-full rounded-xl border border-dark-border object-contain shadow-lg"></div>` : ''}
+        ${item.photo2 ? `<div><p class="text-xs font-semibold text-dark-muted mb-1">&#128247; Resolution Photo</p>
+          <img src="${item.photo2}" class="w-full rounded-xl border border-dark-border object-contain shadow-lg"></div>` : ''}
+        <button onclick="toggleItemPhoto('${item.id}')" class="text-xs text-dark-muted hover:text-white transition">✕ Close</button>
       </div>
     </div>` : '';
   return `
@@ -517,14 +533,13 @@ function openModal(id = null) {
     document.getElementById('f-duplicated').checked   = item?.duplicated     || false;
     document.getElementById('f-new-addition').checked = item?.new_addition   || false;
 
-    // Photo preview
-    const preview = document.getElementById('f-photo-preview');
-    if (item?.photo) {
-      preview.innerHTML = `<img src="${item.photo}" class="w-16 h-16 object-cover rounded-lg border border-dark-border">`;
-      modalPhotoData = item.photo;
-    } else {
-      preview.innerHTML = '';
-    }
+    // Photo previews
+    const preview  = document.getElementById('f-photo-preview');
+    const preview2 = document.getElementById('f-photo2-preview');
+    if (item?.photo)  { preview.innerHTML  = `<img src="${item.photo}"  class="${THUMB}">`; modalPhotoData  = item.photo;  }
+    else              { preview.innerHTML  = ''; modalPhotoData  = null; }
+    if (item?.photo2) { preview2.innerHTML = `<img src="${item.photo2}" class="${THUMB}">`; modalPhotoData2 = item.photo2; }
+    else              { preview2.innerHTML = ''; modalPhotoData2 = null; }
 
     document.getElementById('item-modal').classList.remove('hidden');
   } catch (err) {
@@ -536,26 +551,20 @@ function openModal(id = null) {
 function closeModal() {
   document.getElementById('item-modal').classList.add('hidden');
   editingId = null;
-  modalPhotoData = null;
+  modalPhotoData  = null;
+  modalPhotoData2 = null;
 }
 
-async function previewModalPhoto(input) {
-  if (!input.files || !input.files[0]) return;
-
-  const file = input.files[0];
-
-  // Compress
-  modalPhotoData = await new Promise((resolve, reject) => {
+// Shared image compression — used by all four photo-preview functions
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
         let w = img.width, h = img.height;
         const max = 1280;
-        if (w > max || h > max) {
-          const r = Math.min(max / w, max / h);
-          w = Math.round(w * r); h = Math.round(h * r);
-        }
+        if (w > max || h > max) { const r = Math.min(max/w, max/h); w = Math.round(w*r); h = Math.round(h*r); }
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d', { alpha: false }).drawImage(img, 0, 0, w, h);
@@ -567,9 +576,21 @@ async function previewModalPhoto(input) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
 
-  document.getElementById('f-photo-preview').innerHTML =
-    `<img src="${modalPhotoData}" class="w-16 h-16 object-cover rounded-lg border border-dark-border">`;
+const THUMB = 'w-16 h-16 object-cover rounded-lg border border-dark-border';
+
+async function previewModalPhoto(input) {
+  if (!input.files?.[0]) return;
+  modalPhotoData = await compressImage(input.files[0]);
+  document.getElementById('f-photo-preview').innerHTML = `<img src="${modalPhotoData}" class="${THUMB}">`;
+}
+
+async function previewModalPhoto2(input) {
+  if (!input.files?.[0]) return;
+  modalPhotoData2 = await compressImage(input.files[0]);
+  document.getElementById('f-photo2-preview').innerHTML = `<img src="${modalPhotoData2}" class="${THUMB}">`;
+}
 }
 
 async function saveItem() {
@@ -596,7 +617,8 @@ async function saveItem() {
     resolution_notes: document.getElementById('f-resolution').value.trim(),
     duplicated:       document.getElementById('f-duplicated').checked,
     new_addition:     document.getElementById('f-new-addition').checked,
-    photo:            modalPhotoData || null,
+    photo:            modalPhotoData  || null,
+    photo2:           modalPhotoData2 || null,
     updated_at:       new Date().toISOString(),
   };
 
@@ -726,13 +748,22 @@ function buildInlineFormHTML(item) {
       <textarea id="ie-resolution" rows="2" placeholder="Resolution details..."
                 class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark"></textarea></div>
 
-    <div><label class="block text-xs font-semibold text-dark-muted mb-1">PICTURE</label>
+    <div><label class="block text-xs font-semibold text-dark-muted mb-1">ACTION ITEM PHOTO</label>
       <div class="flex items-center gap-3">
         <label class="cursor-pointer bg-dark-surface border border-dark-border rounded-lg px-4 py-2 text-sm hover:bg-dark-border transition flex items-center gap-2">
           &#128247; Upload Photo
           <input id="ie-photo" type="file" accept="image/*" class="hidden" onchange="previewInlinePhoto(this)">
         </label>
         <div id="ie-photo-preview" class="flex gap-2 flex-wrap"></div>
+      </div></div>
+
+    <div><label class="block text-xs font-semibold text-dark-muted mb-1">RESOLUTION PHOTO</label>
+      <div class="flex items-center gap-3">
+        <label class="cursor-pointer bg-dark-surface border border-dark-border rounded-lg px-4 py-2 text-sm hover:bg-dark-border transition flex items-center gap-2">
+          &#128247; Upload Photo
+          <input id="ie-photo2" type="file" accept="image/*" class="hidden" onchange="previewInlinePhoto2(this)">
+        </label>
+        <div id="ie-photo2-preview" class="flex gap-2 flex-wrap"></div>
       </div></div>
 
     <div class="flex flex-col sm:flex-row gap-3 justify-end pt-2 border-t border-dark-border">
@@ -751,9 +782,11 @@ function populateInlineFields(item) {
   document.getElementById('ie-resolution').value     = item?.resolution_notes  || '';
   document.getElementById('ie-duplicated').checked   = item?.duplicated        || false;
   document.getElementById('ie-new-addition').checked = item?.new_addition      || false;
-  if (item?.photo) {
-    document.getElementById('ie-photo-preview').innerHTML =
-      `<img src="${item.photo}" class="w-16 h-16 object-cover rounded-lg border border-dark-border">`;
+  if (item?.photo)  {
+    document.getElementById('ie-photo-preview').innerHTML  = `<img src="${item.photo}"  class="${THUMB}">`;
+  }
+  if (item?.photo2) {
+    document.getElementById('ie-photo2-preview').innerHTML = `<img src="${item.photo2}" class="${THUMB}">`;
   }
 }
 
@@ -761,7 +794,8 @@ function openInlineEdit(id) {
   closeInlineEdit();
   inlineEditId    = id;
   const item      = allItems.find(i => i.id === id);
-  inlinePhotoData = item?.photo || null;
+  inlinePhotoData  = item?.photo  || null;
+  inlinePhotoData2 = item?.photo2 || null;
 
   const formHTML = buildInlineFormHTML(item);
   const isDesktop = window.innerWidth >= 768;
@@ -789,8 +823,9 @@ function closeInlineEdit() {
   if (!inlineEditId) return;
   document.getElementById(`ie-row-${inlineEditId}`)?.remove();
   document.getElementById(`ie-card-${inlineEditId}`)?.remove();
-  inlineEditId    = null;
-  inlinePhotoData = null;
+  inlineEditId     = null;
+  inlinePhotoData  = null;
+  inlinePhotoData2 = null;
 }
 
 async function saveInlineEdit() {
@@ -816,7 +851,8 @@ async function saveInlineEdit() {
     resolution_notes: document.getElementById('ie-resolution').value.trim(),
     duplicated:       document.getElementById('ie-duplicated').checked,
     new_addition:     document.getElementById('ie-new-addition').checked,
-    photo:            inlinePhotoData || null,
+    photo:            inlinePhotoData  || null,
+    photo2:           inlinePhotoData2 || null,
     updated_at:       new Date().toISOString(),
   };
 
@@ -830,28 +866,15 @@ async function saveInlineEdit() {
 }
 
 async function previewInlinePhoto(input) {
-  if (!input.files || !input.files[0]) return;
-  inlinePhotoData = await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        let w = img.width, h = img.height;
-        const max = 1280;
-        if (w > max || h > max) { const r = Math.min(max/w, max/h); w = Math.round(w*r); h = Math.round(h*r); }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d', { alpha: false }).drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.75));
-      };
-      img.onerror = reject;
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(input.files[0]);
-  });
-  document.getElementById('ie-photo-preview').innerHTML =
-    `<img src="${inlinePhotoData}" class="w-16 h-16 object-cover rounded-lg border border-dark-border">`;
+  if (!input.files?.[0]) return;
+  inlinePhotoData = await compressImage(input.files[0]);
+  document.getElementById('ie-photo-preview').innerHTML = `<img src="${inlinePhotoData}" class="${THUMB}">`;
+}
+
+async function previewInlinePhoto2(input) {
+  if (!input.files?.[0]) return;
+  inlinePhotoData2 = await compressImage(input.files[0]);
+  document.getElementById('ie-photo2-preview').innerHTML = `<img src="${inlinePhotoData2}" class="${THUMB}">`;
 }
 
 async function deleteItem(id) {

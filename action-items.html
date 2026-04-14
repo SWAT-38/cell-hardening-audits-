@@ -182,15 +182,27 @@
                     class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark"></textarea>
         </div>
 
-        <!-- Photo Upload -->
+        <!-- Action Item Photo -->
         <div>
-          <label class="block text-xs font-semibold text-dark-muted mb-1">PICTURE</label>
+          <label class="block text-xs font-semibold text-dark-muted mb-1">ACTION ITEM PHOTO</label>
           <div class="flex items-center gap-3">
             <label class="cursor-pointer bg-dark-surface border border-dark-border rounded-lg px-4 py-2 text-sm hover:bg-dark-border transition flex items-center gap-2">
               📷 Upload Photo
               <input id="f-photo" type="file" accept="image/*" class="hidden" onchange="previewModalPhoto(this)">
             </label>
             <div id="f-photo-preview" class="flex gap-2 flex-wrap"></div>
+          </div>
+        </div>
+
+        <!-- Resolution Photo -->
+        <div>
+          <label class="block text-xs font-semibold text-dark-muted mb-1">RESOLUTION PHOTO</label>
+          <div class="flex items-center gap-3">
+            <label class="cursor-pointer bg-dark-surface border border-dark-border rounded-lg px-4 py-2 text-sm hover:bg-dark-border transition flex items-center gap-2">
+              📷 Upload Photo
+              <input id="f-photo2" type="file" accept="image/*" class="hidden" onchange="previewModalPhoto2(this)">
+            </label>
+            <div id="f-photo2-preview" class="flex gap-2 flex-wrap"></div>
           </div>
         </div>
 
@@ -203,11 +215,11 @@
   </div>
 
   <div id="footer"></div>
-  <script src="js/config.js?v=5"></script>
-  <script src="js/auth.js?v=5"></script>
-  <script src="js/db.js?v=5"></script>
-  <script src="js/nav.js?v=5"></script>
-  <script src="js/export.js?v=5"></script>
-  <script src="js/action-items.js?v=5"></script>
+  <script src="js/config.js?v=6"></script>
+  <script src="js/auth.js?v=6"></script>
+  <script src="js/db.js?v=6"></script>
+  <script src="js/nav.js?v=6"></script>
+  <script src="js/export.js?v=6"></script>
+  <script src="js/action-items.js?v=6"></script>
 </body>
 </html>

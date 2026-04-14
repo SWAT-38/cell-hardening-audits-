@@ -1,8 +1,22 @@
 // Action Items page logic
 
 let allItems = [];
-let editingId = null;
+let editingId     = null;
 let modalPhotoData = null;
+let inlineEditId  = null;
+let inlinePhotoData = null;
+
+// Keep in sync with the ACTION ITEM select options in action-items.html
+const ACTION_ITEM_OPTIONS = [
+  'FLIB (general)', 'MCPIB (general)', 'Sensor', 'Bump Stops', 'Pinch Point',
+  'Transition Plates', 'PLC/HMI', 'GAC (Gateway Access Control)', 'Gap Conveyors',
+  'Switch Table', 'Belt Tension', 'Cables/Wires', 'Conveyor Speed', 'Guide Rails',
+  'Super Tunnel Components', 'Turn Tables', 'CIS', 'Scanner', 'Case Weigher',
+  'Snugger', 'Half Snugger', 'Reject Accumulation',
+  'Reject Merge Upper Section (Half Snugger)', 'Reject Print and Apply (P&A)',
+  'Reject Main Lift (Reinduction Capable)', 'Reject Auxilery Lift (No Reinduction)',
+  'Lift Cell', 'PND', 'Pop-Up Gate',
+];
 let filterStatus = '';
 let filterPriority = '';
 let filterDC = '';
@@ -397,7 +411,7 @@ function renderDesktopRow(item, num) {
     </tr>` : '';
 
   return `
-    <tr class="${bg} hover:bg-dark-surface/50 transition text-xs">
+    <tr id="row-${item.id}" class="${bg} hover:bg-dark-surface/50 transition text-xs">
       <td class="px-3 py-2 font-mono text-dark-muted">${num}</td>
       <td class="px-3 py-2 whitespace-nowrap font-semibold">${item.dc || '—'}</td>
       <td class="px-3 py-2 max-w-[200px]"><div class="font-semibold text-dark-text">${item.action_item || '—'}</div></td>
@@ -437,7 +451,7 @@ function renderMobileCard(item, num) {
       </div>
     </div>` : '';
   return `
-    <div class="bg-dark-card rounded-xl border border-dark-border p-4 ${rowBg(item)}">
+    <div id="card-${item.id}" class="bg-dark-card rounded-xl border border-dark-border p-4 ${rowBg(item)}">
       <div class="flex items-start justify-between gap-2 mb-2">
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-xs font-mono text-dark-muted">#${num}</span>
@@ -465,6 +479,7 @@ function renderMobileCard(item, num) {
 }
 
 function openModal(id = null) {
+  closeInlineEdit(); // inline edit and modal are mutually exclusive
   try {
     editingId = id;
     modalPhotoData = null;
@@ -600,7 +615,243 @@ async function saveItem() {
 }
 
 function editItem(id) {
-  openModal(id);
+  openInlineEdit(id);
+}
+
+// ── Inline Edit ──────────────────────────────────────────────────────────────
+
+function buildInlineFormHTML(item) {
+  const dcOptions = DC_LIST.map(dc =>
+    `<option value="${dc.value}"${item?.dc === dc.value ? ' selected' : ''}>${dc.label}</option>`
+  ).join('');
+
+  const cellOptions = CELL_OPTIONS.map(c =>
+    `<option value="${c}"${item?.cell === c ? ' selected' : ''}>${c}</option>`
+  ).join('');
+
+  const actionOptions = ACTION_ITEM_OPTIONS.map(opt => {
+    const safe = opt.replace(/&/g, '&amp;');
+    return `<option value="${safe}"${item?.action_item === opt ? ' selected' : ''}>${safe}</option>`;
+  }).join('');
+
+  const sel = (val, opts) => opts.map(([v, l]) =>
+    `<option value="${v}"${item?.[val] === v ? ' selected' : ''}>${l}</option>`
+  ).join('');
+
+  return `
+  <div id="ie-form-panel" class="bg-dark-card border-l-4 border-walmart-spark rounded-xl p-5 space-y-4 mt-1">
+    <div class="flex items-center justify-between">
+      <h3 class="font-bold text-sm text-walmart-spark">&#9999;&#65039; Edit Action Item</h3>
+      <button onclick="closeInlineEdit()" class="text-dark-muted hover:text-white text-xl leading-none" title="Close">&times;</button>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div><label class="block text-xs font-semibold text-dark-muted mb-1">ACTION ITEM *</label>
+        <select id="ie-action-item" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          <option value="">Select action item type...</option>${actionOptions}
+        </select></div>
+      <div><label class="block text-xs font-semibold text-dark-muted mb-1">DC #</label>
+        <select id="ie-dc" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          <option value="">Select DC...</option>${dcOptions}
+        </select></div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div><label class="block text-xs font-semibold text-dark-muted mb-1">CELL</label>
+        <select id="ie-cell" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          <option value="">Select cell...</option>${cellOptions}
+        </select></div>
+      <div><label class="block text-xs font-semibold text-dark-muted mb-1">PRIORITY *</label>
+        <select id="ie-priority" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          <option value="">Select...</option>
+          ${sel('priority', [['low','&#128994; Low'],['medium','&#128993; Medium'],['high','&#128308; High']])}
+        </select></div>
+      <div><label class="block text-xs font-semibold text-dark-muted mb-1">STATUS *</label>
+        <select id="ie-status" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          <option value="open"${!item?.status || item.status==='open' ? ' selected':''}>Open</option>
+          <option value="in_progress"${item?.status==='in_progress' ? ' selected':''}>In Progress</option>
+          <option value="closed"${item?.status==='closed' ? ' selected':''}>Closed</option>
+        </select></div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div><label class="block text-xs font-semibold text-dark-muted mb-1">CELL TYPE</label>
+        <select id="ie-cell-type" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          <option value="">Select...</option>
+          <option value="AIB"${item?.cell_type==='AIB' ? ' selected':''}>AIB</option>
+          <option value="AOB"${item?.cell_type==='AOB' ? ' selected':''}>AOB</option>
+          <option value="FLIB"${item?.cell_type==='FLIB' ? ' selected':''}>FLIB</option>
+        </select></div>
+      <div><label class="block text-xs font-semibold text-dark-muted mb-1">ASSIGNED TO</label>
+        <select id="ie-assigned" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+          <option value="">Select...</option>
+          <option value="Symbotic"${item?.assigned==='Symbotic' ? ' selected':''}>Symbotic</option>
+          <option value="Honeywell"${item?.assigned==='Honeywell' ? ' selected':''}>Honeywell</option>
+          <option value="Maintenance"${item?.assigned==='Maintenance' ? ' selected':''}>Maintenance</option>
+        </select></div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div><label class="block text-xs font-semibold text-dark-muted mb-1">TICKET #</label>
+        <input id="ie-ticket" type="text" placeholder="Ticket number..."
+               class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark"></div>
+      <div><label class="block text-xs font-semibold text-dark-muted mb-1">CREATED BY</label>
+        <input id="ie-created-by" type="text" placeholder="Your name..."
+               class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark"></div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div><label class="block text-xs font-semibold text-dark-muted mb-1">CREATION DATE</label>
+        <input id="ie-creation-date" type="date"
+               class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark"></div>
+      <div><label class="block text-xs font-semibold text-dark-muted mb-1">COMPLETED DATE</label>
+        <input id="ie-completed-date" type="date"
+               class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark"></div>
+    </div>
+
+    <div class="flex flex-wrap gap-6 pt-1">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input id="ie-duplicated" type="checkbox" class="w-4 h-4 rounded accent-walmart-spark">
+        <span class="text-sm font-semibold">Duplicated</span></label>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input id="ie-new-addition" type="checkbox" class="w-4 h-4 rounded accent-walmart-spark">
+        <span class="text-sm font-semibold">New Addition</span></label>
+    </div>
+
+    <div><label class="block text-xs font-semibold text-dark-muted mb-1">NOTES</label>
+      <textarea id="ie-notes" rows="2" placeholder="Additional notes..."
+                class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark"></textarea></div>
+
+    <div><label class="block text-xs font-semibold text-dark-muted mb-1">RESOLUTION NOTES</label>
+      <textarea id="ie-resolution" rows="2" placeholder="Resolution details..."
+                class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark"></textarea></div>
+
+    <div><label class="block text-xs font-semibold text-dark-muted mb-1">PICTURE</label>
+      <div class="flex items-center gap-3">
+        <label class="cursor-pointer bg-dark-surface border border-dark-border rounded-lg px-4 py-2 text-sm hover:bg-dark-border transition flex items-center gap-2">
+          &#128247; Upload Photo
+          <input id="ie-photo" type="file" accept="image/*" class="hidden" onchange="previewInlinePhoto(this)">
+        </label>
+        <div id="ie-photo-preview" class="flex gap-2 flex-wrap"></div>
+      </div></div>
+
+    <div class="flex flex-col sm:flex-row gap-3 justify-end pt-2 border-t border-dark-border">
+      <button onclick="closeInlineEdit()" class="px-6 py-2 rounded-lg border border-dark-border text-dark-muted hover:bg-dark-surface transition text-sm">Cancel</button>
+      <button onclick="saveInlineEdit()" class="px-6 py-2 rounded-lg bg-walmart-spark text-dark-bg font-semibold hover:brightness-110 transition text-sm">Save Item</button>
+    </div>
+  </div>`;
+}
+
+function populateInlineFields(item) {
+  document.getElementById('ie-ticket').value         = item?.ticket            || '';
+  document.getElementById('ie-created-by').value     = item?.created_by        || '';
+  document.getElementById('ie-creation-date').value  = item?.creation_date     || new Date().toISOString().slice(0, 10);
+  document.getElementById('ie-completed-date').value = item?.completed_date    || '';
+  document.getElementById('ie-notes').value          = item?.notes             || '';
+  document.getElementById('ie-resolution').value     = item?.resolution_notes  || '';
+  document.getElementById('ie-duplicated').checked   = item?.duplicated        || false;
+  document.getElementById('ie-new-addition').checked = item?.new_addition      || false;
+  if (item?.photo) {
+    document.getElementById('ie-photo-preview').innerHTML =
+      `<img src="${item.photo}" class="w-16 h-16 object-cover rounded-lg border border-dark-border">`;
+  }
+}
+
+function openInlineEdit(id) {
+  closeInlineEdit();
+  inlineEditId    = id;
+  const item      = allItems.find(i => i.id === id);
+  inlinePhotoData = item?.photo || null;
+
+  const formHTML = buildInlineFormHTML(item);
+  const isDesktop = window.innerWidth >= 768;
+
+  if (isDesktop) {
+    // Insert a new <tr> right after the photo-expand row (or main row if no photo)
+    const anchor = document.getElementById(`photo-row-${id}`) || document.getElementById(`row-${id}`);
+    if (anchor) {
+      anchor.insertAdjacentHTML('afterend',
+        `<tr id="ie-row-${id}"><td colspan="20" class="px-4 py-3">${formHTML}</td></tr>`);
+    }
+  } else {
+    const card = document.getElementById(`card-${id}`);
+    if (card) {
+      card.insertAdjacentHTML('afterend',
+        `<div id="ie-card-${id}" class="mt-2">${formHTML}</div>`);
+    }
+  }
+
+  populateInlineFields(item);
+  document.getElementById('ie-form-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeInlineEdit() {
+  if (!inlineEditId) return;
+  document.getElementById(`ie-row-${inlineEditId}`)?.remove();
+  document.getElementById(`ie-card-${inlineEditId}`)?.remove();
+  inlineEditId    = null;
+  inlinePhotoData = null;
+}
+
+async function saveInlineEdit() {
+  const actionItem = document.getElementById('ie-action-item').value;
+  if (!actionItem) { alert('Please select an Action Item type.'); return; }
+
+  const priority = document.getElementById('ie-priority').value;
+  if (!priority)   { alert('Please select a Priority.'); return; }
+
+  const data = {
+    action_item:      actionItem,
+    notes:            document.getElementById('ie-notes').value.trim(),
+    dc:               document.getElementById('ie-dc').value,
+    cell:             document.getElementById('ie-cell').value,
+    priority,
+    status:           document.getElementById('ie-status').value,
+    cell_type:        document.getElementById('ie-cell-type').value,
+    assigned:         document.getElementById('ie-assigned').value,
+    ticket:           document.getElementById('ie-ticket').value.trim(),
+    created_by:       document.getElementById('ie-created-by').value.trim(),
+    creation_date:    document.getElementById('ie-creation-date').value,
+    completed_date:   document.getElementById('ie-completed-date').value,
+    resolution_notes: document.getElementById('ie-resolution').value.trim(),
+    duplicated:       document.getElementById('ie-duplicated').checked,
+    new_addition:     document.getElementById('ie-new-addition').checked,
+    photo:            inlinePhotoData || null,
+    updated_at:       new Date().toISOString(),
+  };
+
+  try {
+    await database.ref(`action_items/${inlineEditId}`).update(data);
+    closeInlineEdit();
+    await loadActionItems();
+  } catch (err) {
+    alert('Failed to save: ' + err.message);
+  }
+}
+
+async function previewInlinePhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  inlinePhotoData = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        const max = 1280;
+        if (w > max || h > max) { const r = Math.min(max/w, max/h); w = Math.round(w*r); h = Math.round(h*r); }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d', { alpha: false }).drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.75));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(input.files[0]);
+  });
+  document.getElementById('ie-photo-preview').innerHTML =
+    `<img src="${inlinePhotoData}" class="w-16 h-16 object-cover rounded-lg border border-dark-border">`;
 }
 
 async function deleteItem(id) {

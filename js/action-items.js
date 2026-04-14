@@ -591,7 +591,6 @@ async function previewModalPhoto2(input) {
   modalPhotoData2 = await compressImage(input.files[0]);
   document.getElementById('f-photo2-preview').innerHTML = `<img src="${modalPhotoData2}" class="${THUMB}">`;
 }
-}
 
 async function saveItem() {
   const actionItem = document.getElementById('f-action-item').value;

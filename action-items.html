@@ -32,8 +32,39 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-dark-muted mb-1">ACTION ITEM *</label>
-            <input id="f-action-item" type="text" placeholder="Describe the action item..."
-                   class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+            <select id="f-action-item"
+                    class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+              <option value="">Select action item type...</option>
+              <option value="FLIB (general)">FLIB (general)</option>
+              <option value="MCPIB (general)">MCPIB (general)</option>
+              <option value="Sensor">Sensor</option>
+              <option value="Bump Stops">Bump Stops</option>
+              <option value="Pinch Point">Pinch Point</option>
+              <option value="Transition Plates">Transition Plates</option>
+              <option value="PLC/HMI">PLC/HMI</option>
+              <option value="GAC (Gateway Access Control)">GAC (Gateway Access Control)</option>
+              <option value="Gap Conveyors">Gap Conveyors</option>
+              <option value="Switch Table">Switch Table</option>
+              <option value="Belt Tension">Belt Tension</option>
+              <option value="Cables/Wires">Cables/Wires</option>
+              <option value="Conveyor Speed">Conveyor Speed</option>
+              <option value="Guide Rails">Guide Rails</option>
+              <option value="Super Tunnel Components">Super Tunnel Components</option>
+              <option value="Turn Tables">Turn Tables</option>
+              <option value="CIS">CIS</option>
+              <option value="Scanner">Scanner</option>
+              <option value="Case Weigher">Case Weigher</option>
+              <option value="Snugger">Snugger</option>
+              <option value="Half Snugger">Half Snugger</option>
+              <option value="Reject Accumulation">Reject Accumulation</option>
+              <option value="Reject Merge Upper Section (Half Snugger)">Reject Merge Upper Section (Half Snugger)</option>
+              <option value="Reject Print and Apply (P&amp;A)">Reject Print and Apply (P&amp;A)</option>
+              <option value="Reject Main Lift (Reinduction Capable)">Reject Main Lift (Reinduction Capable)</option>
+              <option value="Reject Auxilery Lift (No Reinduction)">Reject Auxilery Lift (No Reinduction)</option>
+              <option value="Lift Cell">Lift Cell</option>
+              <option value="PND">PND</option>
+              <option value="Pop-Up Gate">Pop-Up Gate</option>
+            </select>
           </div>
           <div>
             <label class="block text-xs font-semibold text-dark-muted mb-1">DC #</label>
@@ -73,9 +104,6 @@
         <!-- Row 3 -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-        <!-- Row 3 -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
             <label class="block text-xs font-semibold text-dark-muted mb-1">CELL TYPE</label>
             <select id="f-cell-type" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
               <option value="">Select...</option>
@@ -85,14 +113,13 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-dark-muted mb-1">OWNER</label>
-            <input id="f-owner" type="text" placeholder="Owner name..."
-                   class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
-          </div>
-          <div>
             <label class="block text-xs font-semibold text-dark-muted mb-1">ASSIGNED TO</label>
-            <input id="f-assigned" type="text" placeholder="Assigned to..."
-                   class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+            <select id="f-assigned" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+              <option value="">Select...</option>
+              <option value="Symbotic">Symbotic</option>
+              <option value="Honeywell">Honeywell</option>
+              <option value="Maintenance">Maintenance</option>
+            </select>
           </div>
         </div>
 
@@ -176,11 +203,11 @@
   </div>
 
   <div id="footer"></div>
-  <script src="js/config.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/db.js"></script>
-  <script src="js/nav.js"></script>
-  <script src="js/export.js"></script>
-  <script src="js/action-items.js"></script>
+  <script src="js/config.js?v=3"></script>
+  <script src="js/auth.js?v=3"></script>
+  <script src="js/db.js?v=3"></script>
+  <script src="js/nav.js?v=3"></script>
+  <script src="js/export.js?v=3"></script>
+  <script src="js/action-items.js?v=3"></script>
 </body>
 </html>

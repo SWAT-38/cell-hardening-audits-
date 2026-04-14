@@ -176,7 +176,6 @@ function renderPage() {
             <th class="px-3 py-3 whitespace-nowrap">Notes</th>
             <th class="px-3 py-3 whitespace-nowrap">Cell</th>
             <th class="px-3 py-3 whitespace-nowrap">Priority</th>
-            <th class="px-3 py-3 whitespace-nowrap">Owner</th>
             <th class="px-3 py-3 whitespace-nowrap">Assigned</th>
             <th class="px-3 py-3 whitespace-nowrap">Ticket</th>
             <th class="px-3 py-3 whitespace-nowrap">Created</th>
@@ -195,7 +194,7 @@ function renderPage() {
         </thead>
         <tbody class="divide-y divide-dark-border">
           ${filtered.length === 0 ? `
-          <tr><td colspan="21" class="text-center py-12 text-dark-muted">No action items found</td></tr>` :
+          <tr><td colspan="20" class="text-center py-12 text-dark-muted">No action items found</td></tr>` :
           filtered.map((item, idx) => renderDesktopRow(item, idx + 1)).join('')}
         </tbody>
       </table>
@@ -391,7 +390,6 @@ function renderDesktopRow(item, num) {
       <td class="px-3 py-2 max-w-[150px] text-dark-muted">${item.notes || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.cell || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${priorityBadge(item.priority)}</td>
-      <td class="px-3 py-2 whitespace-nowrap">${item.owner || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.assigned || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap font-mono">${item.ticket || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.creation_date || '—'}</td>
@@ -436,7 +434,6 @@ function renderMobileCard(item, num) {
       <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-dark-muted">
         ${item.dc ? `<div><span class="font-semibold">DC:</span> ${item.dc}</div>` : ''}
         ${item.cell ? `<div><span class="font-semibold">Cell:</span> ${item.cell}</div>` : ''}
-        ${item.owner ? `<div><span class="font-semibold">Owner:</span> ${item.owner}</div>` : ''}
         ${item.assigned ? `<div><span class="font-semibold">Assigned:</span> ${item.assigned}</div>` : ''}
         ${item.ticket ? `<div><span class="font-semibold">Ticket:</span> ${item.ticket}</div>` : ''}
         ${item.creation_date ? `<div><span class="font-semibold">Created:</span> ${item.creation_date}</div>` : ''}
@@ -448,53 +445,57 @@ function renderMobileCard(item, num) {
 }
 
 function openModal(id = null) {
-  editingId = id;
-  modalPhotoData = null;
+  try {
+    editingId = id;
+    modalPhotoData = null;
 
-  const item = id ? allItems.find(i => i.id === id) : null;
+    const item = id ? allItems.find(i => i.id === id) : null;
 
-  document.getElementById('modal-title').textContent = id ? 'Edit Action Item' : 'Add Action Item';
+    document.getElementById('modal-title').textContent = id ? 'Edit Action Item' : 'Add Action Item';
 
-  // Populate DCs
-  const dcSel = document.getElementById('f-dc');
-  dcSel.innerHTML = '<option value="">Select DC...</option>';
-  DC_LIST.forEach(dc => {
-    dcSel.innerHTML += `<option value="${dc.value}" ${item?.dc === dc.value ? 'selected' : ''}>${dc.label}</option>`;
-  });
+    // Populate DCs
+    const dcSel = document.getElementById('f-dc');
+    dcSel.innerHTML = '<option value="">Select DC...</option>';
+    DC_LIST.forEach(dc => {
+      dcSel.innerHTML += `<option value="${dc.value}" ${item?.dc === dc.value ? 'selected' : ''}>${dc.label}</option>`;
+    });
 
-  // Populate cells
-  const cellSel = document.getElementById('f-cell');
-  cellSel.innerHTML = '<option value="">Select cell...</option>';
-  CELL_OPTIONS.forEach(c => {
-    cellSel.innerHTML += `<option value="${c}" ${item?.cell === c ? 'selected' : ''}>${c}</option>`;
-  });
+    // Populate cells
+    const cellSel = document.getElementById('f-cell');
+    cellSel.innerHTML = '<option value="">Select cell...</option>';
+    CELL_OPTIONS.forEach(c => {
+      cellSel.innerHTML += `<option value="${c}" ${item?.cell === c ? 'selected' : ''}>${c}</option>`;
+    });
 
-  // Fill form
-  document.getElementById('f-action-item').value    = item?.action_item    || '';
-  document.getElementById('f-notes').value           = item?.notes          || '';
-  document.getElementById('f-priority').value        = item?.priority       || '';
-  document.getElementById('f-status').value          = item?.status         || 'open';
-  document.getElementById('f-cell-type').value       = item?.cell_type      || '';
-  document.getElementById('f-owner').value           = item?.owner          || '';
-  document.getElementById('f-assigned').value        = item?.assigned       || '';
-  document.getElementById('f-ticket').value          = item?.ticket         || '';
-  document.getElementById('f-created-by').value      = item?.created_by     || '';
-  document.getElementById('f-creation-date').value   = item?.creation_date  || new Date().toISOString().slice(0, 10);
-  document.getElementById('f-completed-date').value  = item?.completed_date || '';
-  document.getElementById('f-resolution').value      = item?.resolution_notes || '';
-  document.getElementById('f-duplicated').checked    = item?.duplicated     || false;
-  document.getElementById('f-new-addition').checked  = item?.new_addition   || false;
+    // Fill form
+    document.getElementById('f-action-item').value   = item?.action_item    || '';
+    document.getElementById('f-notes').value          = item?.notes          || '';
+    document.getElementById('f-priority').value       = item?.priority       || '';
+    document.getElementById('f-status').value         = item?.status         || 'open';
+    document.getElementById('f-cell-type').value      = item?.cell_type      || '';
+    document.getElementById('f-assigned').value       = item?.assigned       || '';
+    document.getElementById('f-ticket').value         = item?.ticket         || '';
+    document.getElementById('f-created-by').value     = item?.created_by     || '';
+    document.getElementById('f-creation-date').value  = item?.creation_date  || new Date().toISOString().slice(0, 10);
+    document.getElementById('f-completed-date').value = item?.completed_date || '';
+    document.getElementById('f-resolution').value     = item?.resolution_notes || '';
+    document.getElementById('f-duplicated').checked   = item?.duplicated     || false;
+    document.getElementById('f-new-addition').checked = item?.new_addition   || false;
 
-  // Photo preview
-  const preview = document.getElementById('f-photo-preview');
-  if (item?.photo) {
-    preview.innerHTML = `<img src="${item.photo}" class="w-16 h-16 object-cover rounded-lg border border-dark-border">`;
-    modalPhotoData = item.photo;
-  } else {
-    preview.innerHTML = '';
+    // Photo preview
+    const preview = document.getElementById('f-photo-preview');
+    if (item?.photo) {
+      preview.innerHTML = `<img src="${item.photo}" class="w-16 h-16 object-cover rounded-lg border border-dark-border">`;
+      modalPhotoData = item.photo;
+    } else {
+      preview.innerHTML = '';
+    }
+
+    document.getElementById('item-modal').classList.remove('hidden');
+  } catch (err) {
+    console.error('❌ openModal error:', err);
+    alert('Could not open editor: ' + err.message);
   }
-
-  document.getElementById('item-modal').classList.remove('hidden');
 }
 
 function closeModal() {
@@ -537,8 +538,8 @@ async function previewModalPhoto(input) {
 }
 
 async function saveItem() {
-  const actionItem = document.getElementById('f-action-item').value.trim();
-  if (!actionItem) { alert('Please enter an Action Item description.'); return; }
+  const actionItem = document.getElementById('f-action-item').value;
+  if (!actionItem) { alert('Please select an Action Item type.'); return; }
 
   const priority = document.getElementById('f-priority').value;
   if (!priority) { alert('Please select a Priority.'); return; }
@@ -551,8 +552,8 @@ async function saveItem() {
     priority,
     status:           document.getElementById('f-status').value,
     cell_type:        document.getElementById('f-cell-type').value,
-    owner:            document.getElementById('f-owner').value.trim(),
-    assigned:         document.getElementById('f-assigned').value.trim(),
+    assigned:         document.getElementById('f-assigned').value,
+
     ticket:           document.getElementById('f-ticket').value.trim(),
     created_by:       document.getElementById('f-created-by').value.trim(),
     creation_date:    document.getElementById('f-creation-date').value,

@@ -191,6 +191,7 @@ function renderPage() {
             <th class="px-3 py-3 whitespace-nowrap">Action Item</th>
             <th class="px-3 py-3 whitespace-nowrap">Notes</th>
             <th class="px-3 py-3 whitespace-nowrap">Cell</th>
+<th class="px-3 py-3 whitespace-nowrap">Driveway</th>
 <th class="px-3 py-3 whitespace-nowrap">Location</th>
             <th class="px-3 py-3 whitespace-nowrap">Priority</th>
             <th class="px-3 py-3 whitespace-nowrap">Assigned</th>
@@ -426,6 +427,7 @@ function renderDesktopRow(item, num) {
       <td class="px-3 py-2 max-w-[200px]"><div class="font-semibold text-dark-text">${item.action_item || '—'}</div></td>
       <td class="px-3 py-2 max-w-[150px] text-dark-muted">${item.notes || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.cell || '—'}</td>
+      <td class="px-3 py-2 whitespace-nowrap">${item.driveway || '—'}</td>
       <td class="px-3 py-2 max-w-[180px] text-dark-muted text-xs" title="${item.location || ''}">${item.location || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${priorityBadge(item.priority)}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.assigned || '—'}</td>
@@ -534,6 +536,7 @@ function openModal(id = null) {
     document.getElementById('f-status').value         = item?.status         || 'open';
     document.getElementById('f-cell-type').value      = item?.cell_type      || '';
     document.getElementById('f-assigned').value       = item?.assigned       || '';
+    document.getElementById('f-driveway').value       = item?.driveway       || '';
     document.getElementById('f-ticket').value         = item?.ticket         || '';
     document.getElementById('f-created-by').value     = item?.created_by     || '';
     document.getElementById('f-creation-date').value  = item?.creation_date  || new Date().toISOString().slice(0, 10);
@@ -614,6 +617,7 @@ async function saveItem() {
     dc:               document.getElementById('f-dc').value,
     cell:             document.getElementById('f-cell').value,
     location:         document.getElementById('f-location').value,
+    driveway:         document.getElementById('f-driveway').value,
     priority,
     status:           document.getElementById('f-status').value,
     cell_type:        document.getElementById('f-cell-type').value,
@@ -727,6 +731,15 @@ function buildInlineFormHTML(item) {
     </div>
 
     <div>
+      <label class="block text-xs font-semibold text-dark-muted mb-1">DRIVEWAY</label>
+      <select id="ie-driveway" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+        <option value="">Select driveway...</option>
+        <option value="DRVW 1"${item?.driveway==='DRVW 1' ? ' selected':''}>DRVW 1</option>
+        <option value="DRVW 2"${item?.driveway==='DRVW 2' ? ' selected':''}>DRVW 2</option>
+      </select>
+    </div>
+
+    <div>
       <label class="block text-xs font-semibold text-dark-muted mb-1">LOCATION</label>
       <select id="ie-location" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
         <option value="">Select location...</option>${locationOptions}
@@ -801,6 +814,7 @@ function populateInlineFields(item) {
   document.getElementById('ie-notes').value          = item?.notes             || '';
   document.getElementById('ie-resolution').value     = item?.resolution_notes  || '';
   document.getElementById('ie-location').value       = item?.location          || '';
+  document.getElementById('ie-driveway').value       = item?.driveway          || '';
   document.getElementById('ie-duplicated').checked   = item?.duplicated        || false;
   document.getElementById('ie-new-addition').checked = item?.new_addition      || false;
   if (item?.photo)  {
@@ -862,6 +876,7 @@ async function saveInlineEdit() {
     dc:               document.getElementById('ie-dc').value,
     cell:             document.getElementById('ie-cell').value,
     location:         document.getElementById('ie-location').value,
+    driveway:         document.getElementById('ie-driveway').value,
     priority,
     status:           document.getElementById('ie-status').value,
     cell_type:        document.getElementById('ie-cell-type').value,

@@ -179,5 +179,6 @@ const LOCATION_OPTIONS = [
   'Reinduct Staging Conveyor',
   'Reinduction Paddle Conveyor',
   'Main Lift Conveyor',
+  'Auxiliary Lift Conveyor',
 ];
 

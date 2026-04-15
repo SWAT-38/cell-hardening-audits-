@@ -191,6 +191,7 @@ function renderPage() {
             <th class="px-3 py-3 whitespace-nowrap">Action Item</th>
             <th class="px-3 py-3 whitespace-nowrap">Notes</th>
             <th class="px-3 py-3 whitespace-nowrap">Cell</th>
+<th class="px-3 py-3 whitespace-nowrap">Location</th>
             <th class="px-3 py-3 whitespace-nowrap">Priority</th>
             <th class="px-3 py-3 whitespace-nowrap">Assigned</th>
             <th class="px-3 py-3 whitespace-nowrap">Ticket</th>
@@ -425,6 +426,7 @@ function renderDesktopRow(item, num) {
       <td class="px-3 py-2 max-w-[200px]"><div class="font-semibold text-dark-text">${item.action_item || '—'}</div></td>
       <td class="px-3 py-2 max-w-[150px] text-dark-muted">${item.notes || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.cell || '—'}</td>
+      <td class="px-3 py-2 max-w-[180px] text-dark-muted text-xs" title="${item.location || ''}">${item.location || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap">${priorityBadge(item.priority)}</td>
       <td class="px-3 py-2 whitespace-nowrap">${item.assigned || '—'}</td>
       <td class="px-3 py-2 whitespace-nowrap font-mono">${item.ticket || '—'}</td>
@@ -518,6 +520,13 @@ function openModal(id = null) {
       cellSel.innerHTML += `<option value="${c}" ${item?.cell === c ? 'selected' : ''}>${c}</option>`;
     });
 
+    // Populate locations
+    const locSel = document.getElementById('f-location');
+    locSel.innerHTML = '<option value="">Select location...</option>';
+    LOCATION_OPTIONS.forEach(l => {
+      locSel.innerHTML += `<option value="${l}" ${item?.location === l ? 'selected' : ''}>${l}</option>`;
+    });
+
     // Fill form
     document.getElementById('f-action-item').value   = item?.action_item    || '';
     document.getElementById('f-notes').value          = item?.notes          || '';
@@ -604,6 +613,7 @@ async function saveItem() {
     notes:            document.getElementById('f-notes').value.trim(),
     dc:               document.getElementById('f-dc').value,
     cell:             document.getElementById('f-cell').value,
+    location:         document.getElementById('f-location').value,
     priority,
     status:           document.getElementById('f-status').value,
     cell_type:        document.getElementById('f-cell-type').value,
@@ -654,6 +664,10 @@ function buildInlineFormHTML(item) {
     const safe = opt.replace(/&/g, '&amp;');
     return `<option value="${safe}"${item?.action_item === opt ? ' selected' : ''}>${safe}</option>`;
   }).join('');
+
+  const locationOptions = LOCATION_OPTIONS.map(l =>
+    `<option value="${l}"${item?.location === l ? ' selected' : ''}>${l}</option>`
+  ).join('');
 
   const sel = (val, opts) => opts.map(([v, l]) =>
     `<option value="${v}"${item?.[val] === v ? ' selected' : ''}>${l}</option>`
@@ -710,6 +724,13 @@ function buildInlineFormHTML(item) {
           <option value="Honeywell"${item?.assigned==='Honeywell' ? ' selected':''}>Honeywell</option>
           <option value="Maintenance"${item?.assigned==='Maintenance' ? ' selected':''}>Maintenance</option>
         </select></div>
+    </div>
+
+    <div>
+      <label class="block text-xs font-semibold text-dark-muted mb-1">LOCATION</label>
+      <select id="ie-location" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
+        <option value="">Select location...</option>${locationOptions}
+      </select>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -779,6 +800,7 @@ function populateInlineFields(item) {
   document.getElementById('ie-completed-date').value = item?.completed_date    || '';
   document.getElementById('ie-notes').value          = item?.notes             || '';
   document.getElementById('ie-resolution').value     = item?.resolution_notes  || '';
+  document.getElementById('ie-location').value       = item?.location          || '';
   document.getElementById('ie-duplicated').checked   = item?.duplicated        || false;
   document.getElementById('ie-new-addition').checked = item?.new_addition      || false;
   if (item?.photo)  {
@@ -839,6 +861,7 @@ async function saveInlineEdit() {
     notes:            document.getElementById('ie-notes').value.trim(),
     dc:               document.getElementById('ie-dc').value,
     cell:             document.getElementById('ie-cell').value,
+    location:         document.getElementById('ie-location').value,
     priority,
     status:           document.getElementById('ie-status').value,
     cell_type:        document.getElementById('ie-cell-type').value,

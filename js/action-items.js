@@ -7,6 +7,7 @@ let modalPhotoData2 = null;
 let inlineEditId   = null;
 let inlinePhotoData  = null;
 let inlinePhotoData2 = null;
+let actionTypePieChartInstance = null;
 
 // Keep in sync with the ACTION ITEM select options in action-items.html
 const ACTION_ITEM_OPTIONS = [
@@ -124,6 +125,14 @@ function renderPage() {
       </div>
     </div>
 
+    <!-- Action Type Pie Chart -->
+    <div class="bg-dark-card rounded-xl border border-dark-border p-4 mb-4">
+      <h3 class="text-base font-bold mb-4">&#127378; Action Items by Type${filterDC ? ` (DC ${filterDC})` : ''}</h3>
+      <div style="position:relative; height:380px;">
+        <canvas id="actionTypePieChart"></canvas>
+      </div>
+    </div>
+
     <!-- Bar Chart -->
     <div class="bg-dark-card rounded-xl border border-dark-border p-4 mb-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
@@ -224,6 +233,74 @@ function renderPage() {
         ? `<div class="text-center py-12 text-dark-muted bg-dark-card rounded-xl border border-dark-border">No action items found</div>`
         : filtered.map((item, idx) => renderMobileCard(item, idx + 1)).join('')}
     </div>`;
+  initActionTypePieChart();
+}
+
+function initActionTypePieChart() {
+  const canvas = document.getElementById('actionTypePieChart');
+  if (!canvas) return;
+
+  // Destroy previous instance to avoid "canvas already in use" error
+  if (actionTypePieChartInstance) {
+    actionTypePieChartInstance.destroy();
+    actionTypePieChartInstance = null;
+  }
+
+  const chartItems = filterDC ? allItems.filter(i => i.dc === filterDC) : allItems;
+  if (chartItems.length === 0) return;
+
+  // Group by action_item type
+  const typeCounts = {};
+  chartItems.forEach(item => {
+    const type = item.action_item || 'Unknown';
+    typeCounts[type] = (typeCounts[type] || 0) + 1;
+  });
+
+  const labels = Object.keys(typeCounts).sort((a, b) => typeCounts[b] - typeCounts[a]);
+  const data   = labels.map(l => typeCounts[l]);
+  const total  = chartItems.length;
+
+  // 30-colour palette — distinct enough for many types
+  const palette = [
+    '#ffc220','#0053e2','#e17055','#00b894','#6c5ce7','#fd9644','#a29bfe',
+    '#55efc4','#fdcb6e','#74b9ff','#ff7675','#81ecec','#fab1a0','#636e72',
+    '#b2bec3','#d63031','#00cec9','#e84393','#2d3436','#f9ca24','#6ab04c',
+    '#eb4d4b','#22a6b3','#be2edd','#4834d4','#f0932b','#badc58','#c7ecee',
+    '#778ca3','#e55039',
+  ];
+
+  actionTypePieChartInstance = new Chart(canvas, {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: labels.map((_, i) => palette[i % palette.length]),
+        borderColor: '#1a1a2e',
+        borderWidth: 2,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            color: '#b2bec3',
+            font: { size: 11 },
+            boxWidth: 14,
+            padding: 10,
+          },
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.raw} (${((ctx.raw / total) * 100).toFixed(1)}%)`,
+          },
+        },
+      },
+    },
+  });
 }
 
 function priorityBadge(p) {

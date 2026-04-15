@@ -246,7 +246,13 @@ function initActionTypePieChart() {
     actionTypePieChartInstance = null;
   }
 
-  const chartItems = filterDC ? allItems.filter(i => i.dc === filterDC) : allItems;
+  const chartItems = allItems.filter(i => {
+    if (filterDC       && i.dc       !== filterDC)       return false;
+    if (filterCell     && i.cell     !== filterCell)     return false;
+    if (filterStatus   && i.status   !== filterStatus)   return false;
+    if (filterPriority && i.priority !== filterPriority) return false;
+    return true;
+  });
   if (chartItems.length === 0) return;
 
   // Group by action_item type

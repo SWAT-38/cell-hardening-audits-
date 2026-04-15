@@ -180,5 +180,7 @@ const LOCATION_OPTIONS = [
   'Reinduction Paddle Conveyor',
   'Main Lift Conveyor',
   'Auxiliary Lift Conveyor',
+  'FLIB Upper',
+  'FLIB Lower',
 ];
 

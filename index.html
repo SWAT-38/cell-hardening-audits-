@@ -27,6 +27,89 @@
       </div>
       <div id="dc-filter-wrap"></div>
     </div>
+    <!-- ── User Guide ───────────────────────────────────────────── -->
+    <details class="mb-6 bg-dark-card border border-dark-border rounded-xl overflow-hidden group">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer select-none list-none hover:bg-dark-surface transition">
+        <span class="flex items-center gap-3">
+          <span class="text-xl">&#x1F4D6;</span>
+          <span class="font-bold text-base">User Guide &mdash; How to Use This App</span>
+        </span>
+        <span class="text-dark-muted text-sm group-open:hidden">&#9660; Expand</span>
+        <span class="text-dark-muted text-sm hidden group-open:inline">&#9650; Collapse</span>
+      </summary>
+
+      <div class="px-5 pb-6 pt-2 space-y-4 border-t border-dark-border">
+
+        <p class="text-sm text-dark-muted pt-2">
+          This app tracks <strong class="text-dark-text">FLIB cell hardening inspections</strong> from first audit through final acceptance.
+          Follow the workflow below in order.
+        </p>
+
+        <!-- Step 1 -->
+        <div class="flex gap-4 bg-dark-surface rounded-xl p-4 border border-dark-border">
+          <div class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-dark-bg" style="background:#ffc220;">1</div>
+          <div>
+            <p class="font-bold text-sm mb-1">&#x1F4CB; Create a New Audit</p>
+            <p class="text-sm text-dark-muted">Click <strong class="text-walmart-spark">+ New Audit</strong> to begin a cell hardening inspection. Select the DC, cell number, and inspector name. Work through each checklist item &mdash; mark pass or fail and add notes on any failures. <strong class="text-dark-text">An audit should always be performed before opening action items.</strong></p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="flex gap-4 bg-dark-surface rounded-xl p-4 border border-dark-border">
+          <div class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-dark-bg" style="background:#ffc220;">2</div>
+          <div>
+            <p class="font-bold text-sm mb-1">&#x26A0;&#xFE0F; Open Action Items for Failures</p>
+            <p class="text-sm text-dark-muted">After completing an audit, navigate to the <strong class="text-dark-text">Action Items</strong> page and create an action item for each failure found. Fill in the Action Item type, DC, Cell, Driveway, Location, Priority, and assign it to the responsible party (Symbotic, Honeywell, or Maintenance). Action items <em>can</em> be opened independently at any time, but should always reference a completed audit.</p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="flex gap-4 bg-dark-surface rounded-xl p-4 border border-dark-border">
+          <div class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-dark-bg" style="background:#ffc220;">3</div>
+          <div>
+            <p class="font-bold text-sm mb-1">&#x1F504; Track &amp; Close Action Items</p>
+            <p class="text-sm text-dark-muted">Monitor open items on the Action Items page. Update the status to <strong class="text-dark-text">In Progress</strong> when work begins and <strong class="text-dark-text">Closed</strong> once resolved. Add resolution notes and a resolution photo when closing. Use the priority and DC filters to focus on what needs attention first.</p>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="flex gap-4 bg-dark-surface rounded-xl p-4 border border-dark-border">
+          <div class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-dark-bg" style="background:#ffc220;">4</div>
+          <div>
+            <p class="font-bold text-sm mb-1">&#x1F4E6; Archive the Audit</p>
+            <p class="text-sm text-dark-muted">Once a cell has been <strong class="text-dark-text">accepted by the Walmart Automation Site Engineer</strong>, move the audit to the <strong class="text-dark-text">Archive</strong> page. All audits &mdash; both passing and failing &mdash; should be archived after acceptance. The archive serves as the permanent record of the cell&rsquo;s hardening history.</p>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="flex gap-4 bg-dark-surface rounded-xl p-4 border border-dark-border">
+          <div class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-dark-bg" style="background:#ffc220;">5</div>
+          <div>
+            <p class="font-bold text-sm mb-1">&#x1F4E7; Export &amp; Send PDFs to Symbotic</p>
+            <p class="text-sm text-dark-muted">Use the <strong class="text-dark-text">Export PDF</strong> or <strong class="text-dark-text">Email PDF</strong> buttons on the Action Items page to generate and send reports directly to Symbotic. PDFs capture the full action item list including status, priority, ticket numbers, and resolution notes &mdash; keeping communication clear and documented.</p>
+          </div>
+        </div>
+
+        <!-- Quick-reference flow -->
+        <div class="rounded-xl border border-dark-border bg-dark-bg p-4">
+          <p class="text-xs font-bold text-dark-muted uppercase tracking-widest mb-3">Quick Reference Workflow</p>
+          <div class="flex flex-wrap items-center gap-2 text-sm font-semibold">
+            <span class="px-3 py-1 rounded-full" style="background:#ffc22022;color:#ffc220;">&#x1F4CB; New Audit</span>
+            <span class="text-dark-muted">&rarr;</span>
+            <span class="px-3 py-1 rounded-full bg-red-900/30 text-red-400">&#x26A0;&#xFE0F; Action Items</span>
+            <span class="text-dark-muted">&rarr;</span>
+            <span class="px-3 py-1 rounded-full bg-blue-900/30 text-blue-400">&#x1F504; Resolve &amp; Close</span>
+            <span class="text-dark-muted">&rarr;</span>
+            <span class="px-3 py-1 rounded-full bg-green-900/30 text-green-400">&#x2705; Site Engineer Accepts</span>
+            <span class="text-dark-muted">&rarr;</span>
+            <span class="px-3 py-1 rounded-full bg-dark-surface border border-dark-border text-dark-muted">&#x1F4E6; Archive</span>
+          </div>
+        </div>
+
+      </div>
+    </details>
+    <!-- ──────────────────────────────────────────────────────────── -->
+
     <div id="content">
       <div class="text-center py-20 text-dark-muted">Loading audits…</div>
     </div>

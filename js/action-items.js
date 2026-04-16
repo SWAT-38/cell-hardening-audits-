@@ -819,6 +819,7 @@ function buildInlineFormHTML(item) {
         <option value="">Select driveway...</option>
         <option value="DRVW 1"${item?.driveway==='DRVW 1' ? ' selected':''}>DRVW 1</option>
         <option value="DRVW 2"${item?.driveway==='DRVW 2' ? ' selected':''}>DRVW 2</option>
+        <option value="NA"${item?.driveway==='NA' ? ' selected':''}>NA</option>
       </select>
     </div>
 

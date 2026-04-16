@@ -188,6 +188,33 @@ function renderPage() {
         </button>` : ''}
         <div class="text-xs text-dark-muted ml-auto pt-4">Showing ${filtered.length} of ${allItems.length} items</div>
       </div>
+      <!-- Priority Reference -->
+      <div class="mt-4 pt-4 border-t border-dark-border">
+        <p class="text-xs font-bold text-dark-muted uppercase tracking-widest mb-2">&#128204; Priority Reference</p>
+        <div class="flex flex-wrap gap-3">
+          <div class="flex items-start gap-2 bg-dark-surface rounded-lg px-3 py-2 border border-dark-border flex-1 min-w-[180px]">
+            <span class="text-base leading-none mt-0.5">&#128994;</span>
+            <div>
+              <p class="text-xs font-bold text-green-400">Low</p>
+              <p class="text-xs text-dark-muted">Not a go-live blocker &mdash; must still be resolved before final acceptance.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-2 bg-dark-surface rounded-lg px-3 py-2 border border-dark-border flex-1 min-w-[180px]">
+            <span class="text-base leading-none mt-0.5">&#128993;</span>
+            <div>
+              <p class="text-xs font-bold text-yellow-400">Medium</p>
+              <p class="text-xs text-dark-muted">Potential go-live blocker &mdash; review with site engineer before proceeding.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-2 bg-dark-surface rounded-lg px-3 py-2 border border-red-900/50 flex-1 min-w-[180px]">
+            <span class="text-base leading-none mt-0.5">&#128308;</span>
+            <div>
+              <p class="text-xs font-bold text-red-400">High</p>
+              <p class="text-xs text-dark-muted">Go-live blocker &mdash; must be resolved and verified before the cell can go live.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Desktop Table -->

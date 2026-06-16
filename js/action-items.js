@@ -83,6 +83,8 @@ function renderPage() {
     return true;
   });
 
+  window.currentFilteredItems = filtered;
+
   document.getElementById('content').innerHTML = `
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
@@ -94,13 +96,13 @@ function renderPage() {
         <button onclick="openModal()" class="flex-1 sm:flex-none bg-walmart-spark text-dark-bg font-semibold px-4 py-3 rounded-lg hover:brightness-110 active:brightness-90 transition text-sm flex items-center justify-center gap-2">
           &#43; Add Item
         </button>
-        <button onclick="exportPDF('Action-Items.pdf')" 
+        <button onclick="exportWord('Action-Items.doc')" 
                 class="flex-1 sm:flex-none bg-dark-surface text-dark-text border border-dark-border font-semibold px-4 py-3 rounded-lg hover:bg-dark-border transition text-sm flex items-center justify-center gap-2">
-          📄 Export PDF
+           Export Word Doc
         </button>
-        <button onclick="emailPDF('Action-Items.pdf', 'Action Items Report')" 
+        <button onclick="emailWord('Action-Items.doc', 'Action Items Report')" 
                 class="flex-1 sm:flex-none bg-dark-surface text-dark-text border border-dark-border font-semibold px-4 py-3 rounded-lg hover:bg-dark-border transition text-sm flex items-center justify-center gap-2">
-          📧 Email PDF
+           Email Word Doc
         </button>
       </div>
     </div>

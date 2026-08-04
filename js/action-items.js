@@ -664,6 +664,10 @@ function openModal(id = null) {
     else              { preview2.innerHTML = ''; modalPhotoData2 = null; }
 
     document.getElementById('item-modal').classList.remove('hidden');
+    // Reset scroll position — the modal wrapper's scrollTop persists across
+    // show/hide toggles since the DOM isn't recreated, so without this a
+    // previously-scrolled-down modal would reopen mid-scroll instead of at top.
+    document.getElementById('item-modal').scrollTop = 0;
   } catch (err) {
     console.error('❌ openModal error:', err);
     alert('Could not open editor: ' + err.message);

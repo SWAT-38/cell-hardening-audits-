@@ -182,5 +182,6 @@ const LOCATION_OPTIONS = [
   'Auxiliary Lift Conveyor',
   'FLIB Upper',
   'FLIB Lower',
+  'Phase 1 Cell',
 ];
 

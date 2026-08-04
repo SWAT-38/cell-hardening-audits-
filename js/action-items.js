@@ -18,7 +18,7 @@ const ACTION_ITEM_OPTIONS = [
   'Snugger', 'Half Snugger', 'Reject Accumulation',
   'Reject Merge Upper Section (Half Snugger)', 'Reject Print and Apply (P&A)',
   'Reject Main Lift (Reinduction Capable)', 'Reject Auxilery Lift (No Reinduction)',
-  'Lift Cell', 'PND', 'Pop-Up Gate',
+  'Lift Cell', 'PND', 'Pop-Up Gate', 'Training & Process',
 ];
 let filterStatus = '';
 let filterPriority = '';
@@ -627,12 +627,10 @@ function openModal(id = null) {
       dcSel.innerHTML += `<option value="${dc.value}" ${item?.dc === dc.value ? 'selected' : ''}>${dc.label}</option>`;
     });
 
-    // Populate cells
-    const cellSel = document.getElementById('f-cell');
-    cellSel.innerHTML = '<option value="">Select cell...</option>';
-    CELL_OPTIONS.forEach(c => {
-      cellSel.innerHTML += `<option value="${c}" ${item?.cell === c ? 'selected' : ''}>${c}</option>`;
-    });
+    // Populate cell datalist + set current value (input now allows free-typing)
+    const cellDatalist = document.getElementById('f-cell-options');
+    cellDatalist.innerHTML = CELL_OPTIONS.map(c => `<option value="${c}">`).join('');
+    document.getElementById('f-cell').value = item?.cell || '';
 
     // Populate locations
     const locSel = document.getElementById('f-location');
@@ -727,7 +725,7 @@ async function saveItem() {
     action_item:      actionItem,
     notes:            document.getElementById('f-notes').value.trim(),
     dc:               document.getElementById('f-dc').value,
-    cell:             document.getElementById('f-cell').value,
+    cell:             document.getElementById('f-cell').value.trim(),
     location:         document.getElementById('f-location').value,
     driveway:         document.getElementById('f-driveway').value,
     priority,
@@ -772,9 +770,7 @@ function buildInlineFormHTML(item) {
     `<option value="${dc.value}"${item?.dc === dc.value ? ' selected' : ''}>${dc.label}</option>`
   ).join('');
 
-  const cellOptions = CELL_OPTIONS.map(c =>
-    `<option value="${c}"${item?.cell === c ? ' selected' : ''}>${c}</option>`
-  ).join('');
+  const cellOptions = CELL_OPTIONS.map(c => `<option value="${c}">`).join('');
 
   const actionOptions = ACTION_ITEM_OPTIONS.map(opt => {
     const safe = opt.replace(/&/g, '&amp;');
@@ -809,9 +805,10 @@ function buildInlineFormHTML(item) {
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div><label class="block text-xs font-semibold text-dark-muted mb-1">CELL</label>
-        <select id="ie-cell" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
-          <option value="">Select cell...</option>${cellOptions}
-        </select></div>
+        <input type="text" id="ie-cell" list="ie-cell-options" autocomplete="off" value="${item?.cell || ''}"
+               class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark placeholder-dark-muted"
+               placeholder="Select or type a cell #">
+        <datalist id="ie-cell-options">${cellOptions}</datalist></div>
       <div><label class="block text-xs font-semibold text-dark-muted mb-1">PRIORITY *</label>
         <select id="ie-priority" class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-spark">
           <option value="">Select...</option>
@@ -987,7 +984,7 @@ async function saveInlineEdit() {
     action_item:      actionItem,
     notes:            document.getElementById('ie-notes').value.trim(),
     dc:               document.getElementById('ie-dc').value,
-    cell:             document.getElementById('ie-cell').value,
+        cell:             document.getElementById('ie-cell').value.trim(),
     location:         document.getElementById('ie-location').value,
     driveway:         document.getElementById('ie-driveway').value,
     priority,

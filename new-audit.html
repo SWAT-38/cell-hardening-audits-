@@ -32,10 +32,10 @@
       </div>
       <div>
         <label for="line_id" class="block text-sm font-semibold mb-1 text-dark-text">Cell # *</label>
-        <select id="line_id" required
-                class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-walmart-spark">
-          <option value="" disabled selected>Select a cell…</option>
-        </select>
+        <input type="text" id="line_id" list="cell-options" required autocomplete="off"
+               class="w-full bg-dark-surface border border-dark-border text-dark-text rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-walmart-spark placeholder-dark-muted"
+               placeholder="Select or type a cell #">
+        <datalist id="cell-options"></datalist>
       </div>
       <button type="submit"
               class="w-full bg-walmart-spark text-dark-bg font-semibold py-4 rounded-lg hover:brightness-110 active:brightness-90 transition text-lg">
@@ -57,9 +57,9 @@
     DC_OPTIONS.forEach(dc => {
       locSel.innerHTML += `<option value="${dc.value}">${dc.label}</option>`;
     });
-    const cellSel = document.getElementById('line_id');
+    const cellSel = document.getElementById('cell-options');
     CELL_OPTIONS.forEach(c => {
-      cellSel.innerHTML += `<option value="${c}">${c}</option>`;
+      cellSel.innerHTML += `<option value="${c}">`;
     });
 
     // Form submit
@@ -67,7 +67,7 @@
       e.preventDefault();
       const auditor = document.getElementById('auditor').value.trim();
       const location = document.getElementById('location').value;
-      const lineId = document.getElementById('line_id').value;
+      const lineId = document.getElementById('line_id').value.trim();
       console.log('🚀 Creating audit:', { auditor, location, lineId });
       try {
         const audit = await db.createAudit(auditor, lineId, location);
